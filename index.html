@@ -8,6 +8,7 @@
     <!-- Library Eksternal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -50,6 +51,7 @@
         .btn-tambah { background: #27ae60; color: white; align-self: end; height: 38px;}
 
         h2 { color: #34495e; font-size: 16px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; min-width: 600px; }
@@ -104,6 +106,12 @@
                 <button class="btn-proj-new" onclick="buatProyekBaru()">➕ Baru</button>
                 <button class="btn-proj-rename" onclick="ubahNamaProyek()">✏️ Rename</button>
                 <button class="btn-proj-del" onclick="hapusProyek()">🗑️ Hapus</button>
+                
+                <div style="border-left: 2px solid #ccc; padding-left: 8px; margin-left: 5px; display:flex; gap:8px;">
+                    <button style="background:#8e44ad; color:white;" onclick="exportJSON()">⬇️ Backup</button>
+                    <button style="background:#34495e; color:white;" onclick="document.getElementById('importFile').click()">⬆️ Import</button>
+                    <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importJSON(event)">
+                </div>
             </div>
         </div>
         
@@ -129,7 +137,10 @@
             </div>
         </div>
 
-        <h2><span>Rincian Kebutuhan</span> <button style="background:#e74c3c; color:white;" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button></h2>
+        <h2>
+            <span>Rincian Kebutuhan</span> 
+            <button style="background:#e74c3c; color:white;" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button>
+        </h2>
         <div class="table-responsive">
             <table id="tableRincian">
                 <thead>
@@ -139,7 +150,14 @@
             </table>
         </div>
 
-        <h2><span>Rekapitulasi Belanja</span> <button style="background:#16a085; color:white;" onclick="exportTableToCSV('tableRekap', 'Rekap.csv')">📤 Export .csv</button></h2>
+        <h2>
+            <span>Rekapitulasi Belanja</span> 
+            <div class="action-buttons">
+                <button style="background:#2980b9; color:white;" onclick="exportPDF()">📄 Cetak PDF</button>
+                <button style="background:#e67e22; color:white;" onclick="exportImage()">🖼️ Simpan Gambar</button>
+                <button style="background:#16a085; color:white;" onclick="exportTableToCSV('tableRekap', 'Rekap.csv')">📤 Export .csv</button>
+            </div>
+        </h2>
         <div class="table-responsive">
             <table id="tableRekap">
                 <thead>
@@ -272,20 +290,10 @@
             renderTabel();
         }
 
-        // ==========================================
-        // FUNGSI PROYEK YANG SUDAH DIPERBAIKI
-        // ==========================================
         function gantiProyek() {
-            // 1. Simpan tabel saat ini ke dalam array proyek lama
             projects[currentProject] = dataMaterial; 
-            
-            // 2. Ganti nama proyek aktif
             currentProject = document.getElementById('projectSelector').value;
-            
-            // 3. Tarik isi tabel untuk proyek yang baru
             dataMaterial = projects[currentProject] || [];
-            
-            // 4. Simpan perubahan ke Cloud
             simpanKeCloud();
         }
 
@@ -293,17 +301,10 @@
             let nama = prompt("Masukkan nama proyek baru:");
             if (nama && nama.trim() !== "") {
                 if (projects[nama]) return alert("Nama proyek sudah ada!");
-                
-                // Simpan data proyek yang lama dulu
                 projects[currentProject] = dataMaterial; 
-                
-                // Bikin proyek baru dan langsung jadikan proyek aktif
                 projects[nama] = []; 
                 currentProject = nama; 
-                
-                // Siapkan tabel kosong untuk proyek baru
                 dataMaterial = projects[currentProject];
-                
                 simpanKeCloud();
             }
         }
@@ -312,16 +313,10 @@
             let namaBaru = prompt("Ubah nama proyek:", currentProject);
             if (namaBaru && namaBaru.trim() !== "" && namaBaru !== currentProject) {
                 if (projects[namaBaru]) return alert("Nama tersebut sudah dipakai!");
-                
-                // Pastikan data tersimpan di nama lama
                 projects[currentProject] = dataMaterial; 
-                
-                // Salin data ke nama baru, lalu hapus yang lama
                 projects[namaBaru] = projects[currentProject];
                 delete projects[currentProject]; 
-                
                 currentProject = namaBaru;
-                
                 simpanKeCloud();
             }
         }
@@ -329,20 +324,12 @@
         function hapusProyek() {
             if (Object.keys(projects).length <= 1) return alert("Minimal harus ada 1 proyek.");
             if (confirm(`Yakin ingin menghapus seluruh data pada "${currentProject}"?`)) {
-                
-                // Hapus proyek saat ini
                 delete projects[currentProject];
-                
-                // Pindah ke proyek pertama yang tersisa di daftar
                 currentProject = Object.keys(projects)[0];
-                
-                // Tarik data tabel dari proyek tersebut
                 dataMaterial = projects[currentProject] || []; 
-                
                 simpanKeCloud();
             }
         }
-        // ==========================================
 
         function bersihkanTabel() {
             if (confirm("Hapus semua rincian di tabel ini?")) {
@@ -438,7 +425,95 @@
                 tbodyRekap.innerHTML += `<tr><td><strong>${data.tipe.toUpperCase()}</strong></td><td>${data.jenis}</td><td>${teksStandar}</td><td>${teksKebutuhan}</td><td style="color:#27ae60; font-weight:bold;">${teksBeli}</td><td>${teksSisa}</td></tr>`;
             }
         }
-        
+
+        // ==========================================
+        // FITUR BARU: IMPORT, EXPORT, PDF & GAMBAR
+        // ==========================================
+
+        // 1. Export Data Proyek ke File JSON
+        function exportJSON() {
+            projects[currentProject] = dataMaterial; // Pastikan data terbaru tersimpan
+            const dataStr = JSON.stringify(projects, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Backup_Bengkel_Las_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 2. Import Data Proyek dari JSON
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (confirm("Peringatan: Mengimpor file akan menimpa SELURUH data proyek saat ini di database. Lanjutkan?")) {
+                        projects = importedData;
+                        currentProject = Object.keys(projects)[0] || "Proyek Utama";
+                        dataMaterial = projects[currentProject] || [];
+                        simpanKeCloud();
+                        alert("Data proyek berhasil di-restore!");
+                    }
+                } catch (err) {
+                    alert("Format file tidak valid atau rusak!");
+                }
+                event.target.value = ''; // Reset input file
+            };
+            reader.readAsText(file);
+        }
+
+        // 3. Export Keseluruhan Tabel ke Gambar (PNG)
+        function exportImage() {
+            alert("Sedang mengambil gambar, harap tunggu sebentar...");
+            html2canvas(document.getElementById('appContent'), {scale: 2}).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Data_${currentProject}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+
+        // 4. Export Keseluruhan Tabel ke PDF
+        function exportPDF() {
+            alert("Sedang menyusun PDF, harap tunggu sebentar...");
+            const { jsPDF } = window.jspdf;
+            html2canvas(document.getElementById('appContent'), {scale: 2}).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Data_${currentProject}.pdf`);
+            });
+        }
+
+        // 5. Fungsi Ekspor Tabel ke CSV (Excel)
+        function exportTableToCSV(tableID, filename) {
+            let csv = [];
+            let rows = document.querySelectorAll(`#${tableID} tr`);
+            for (let i = 0; i < rows.length; i++) {
+                let row = [], cols = rows[i].querySelectorAll("td, th");
+                for (let j = 0; j < cols.length; j++) {
+                    // Tambahkan tanda kutip agar format terjaga jika ada koma di dalam teks
+                    row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                }
+                csv.push(row.join(","));
+            }
+            let csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+            let downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
         window.onload = function() { toggleForm(); };
     </script>
 </body>
