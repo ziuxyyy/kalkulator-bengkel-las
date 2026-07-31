@@ -7,7 +7,6 @@
     
     <!-- Library Eksternal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- MENGGANTI HTML2CANVAS LAMA DENGAN VERSI PRO UNTUK FIX BUG 'OKLAB' -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro/dist/html2canvas-pro.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -152,9 +151,15 @@
             </div>
         </div>
 
-        <!-- AREA PRINT (Untuk keperluan Export Gambar & PDF) -->
+        <!-- AREA PRINT -->
         <div id="areaPrint">
-            <h2 id="judulPrint" style="display:none; text-align:center; color:black; margin-bottom:15px; font-size:20px; font-weight:bold;">Data Proyek</h2>
+            
+            <!-- HEADER KHUSUS PRINT (Ditampilkan HANYA saat di-export) -->
+            <div id="headerPrint" style="display:none; text-align:center; color:black; margin-bottom:25px; border-bottom: 3px solid #2c3e50; padding-bottom: 15px;">
+                <h1 style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: 2px;">BENGKEL LAS AJAIB</h1>
+                <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold;">Rincian Kebutuhan Material</p>
+                <p style="margin: 5px 0 0 0; font-size: 16px;">Nama Proyek: <span id="namaProyekPrint" style="color: #c0392b; font-weight: bold;"></span></p>
+            </div>
             
             <h2><span>Rincian Kebutuhan</span> <button style="background:#e74c3c; color:white;" class="hide-on-print" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button></h2>
             <div class="table-responsive">
@@ -166,7 +171,7 @@
                 </table>
             </div>
 
-            <h2>
+            <h2 style="margin-top: 30px;">
                 <span>Rekapitulasi Belanja</span> 
                 <div class="hide-on-print">
                     <button class="btn-img" id="btnExportImg" onclick="exportGambar()">📸 Export Gambar</button>
@@ -364,17 +369,8 @@
         }
 
         // ==========================================
-        // SISTEM EXPORT PDF & GAMBAR (FIX OKLAB BUG)
+        // SISTEM EXPORT PDF & GAMBAR (Dengan Header & Anti Kedip)
         // ==========================================
-        function siapkanTampilanPrint(status) {
-            const sembunyi = document.querySelectorAll('.hide-on-print');
-            sembunyi.forEach(el => el.style.display = status ? 'none' : '');
-            
-            const judul = document.getElementById('judulPrint');
-            judul.innerText = `Data Material: ${currentProject}`;
-            judul.style.display = status ? 'block' : 'none';
-        }
-
         async function exportGambar() {
             const btn = document.getElementById('btnExportImg');
             const teksAsli = btn.innerText;
@@ -382,31 +378,60 @@
 
             try {
                 window.scrollTo(0, 0); 
-                siapkanTampilanPrint(true); 
-
+                
+                // HINDARI mengubah layar asli agar tidak berkedip.
+                // Buka overflow layar asli hanya untuk memastikan html2canvas membaca ukurannya.
                 const tables = document.querySelectorAll('.table-responsive');
                 tables.forEach(t => t.style.overflow = 'visible');
 
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 const area = document.getElementById('areaPrint');
-                // Panggil html2canvas langsung dari library html2canvas-pro
+                
                 const canvas = await html2canvas(area, {
                     scale: 2,
                     backgroundColor: "#ffffff",
                     useCORS: true,
-                    allowTaint: true
+                    allowTaint: true,
+                    // onclone memungkinkan kita mengedit tampilan hasil ekspor TANPA mengganggu layar asli
+                    onclone: function(clonedDoc) {
+                        const areaClone = clonedDoc.getElementById('areaPrint');
+                        
+                        // Sembunyikan semua tombol di hasil foto
+                        const sembunyi = areaClone.querySelectorAll('.hide-on-print');
+                        sembunyi.forEach(el => el.style.display = 'none');
+                        
+                        // Tampilkan Kop Surat "BENGKEL LAS AJAIB" di hasil foto
+                        const headerPrint = areaClone.querySelector('#headerPrint');
+                        if(headerPrint) headerPrint.style.display = 'block';
+                        
+                        // Isi nama proyeknya
+                        const namaProyek = areaClone.querySelector('#namaProyekPrint');
+                        if(namaProyek) namaProyek.innerText = currentProject;
+
+                        // Pastikan tabel rapi dan tidak scroll
+                        const responsiveDivs = areaClone.querySelectorAll('.table-responsive');
+                        responsiveDivs.forEach(div => {
+                            div.style.overflow = 'visible';
+                            div.style.width = '100%';
+                        });
+                        
+                        // Buat background kotak menjadi rapi
+                        areaClone.style.padding = '30px';
+                        areaClone.style.borderRadius = '0';
+                        areaClone.style.boxShadow = 'none';
+                    }
                 });
 
                 const link = document.createElement('a');
-                link.download = `Gambar_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                link.download = `Material_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (err) {
                 console.error(err);
                 alert("Terjadi kesalahan saat memproses gambar: " + err.message);
             } finally {
-                siapkanTampilanPrint(false); 
+                // Kembalikan overflow ke auto
                 document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
                 btn.innerText = teksAsli;
             }
@@ -419,7 +444,6 @@
 
             try {
                 window.scrollTo(0, 0);
-                siapkanTampilanPrint(true); 
 
                 const tables = document.querySelectorAll('.table-responsive');
                 tables.forEach(t => t.style.overflow = 'visible');
@@ -427,26 +451,50 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 const area = document.getElementById('areaPrint');
+                
                 const canvas = await html2canvas(area, {
                     scale: 2,
                     backgroundColor: "#ffffff",
                     useCORS: true,
-                    allowTaint: true
+                    allowTaint: true,
+                    onclone: function(clonedDoc) {
+                        const areaClone = clonedDoc.getElementById('areaPrint');
+                        
+                        const sembunyi = areaClone.querySelectorAll('.hide-on-print');
+                        sembunyi.forEach(el => el.style.display = 'none');
+                        
+                        const headerPrint = areaClone.querySelector('#headerPrint');
+                        if(headerPrint) headerPrint.style.display = 'block';
+                        
+                        const namaProyek = areaClone.querySelector('#namaProyekPrint');
+                        if(namaProyek) namaProyek.innerText = currentProject;
+
+                        const responsiveDivs = areaClone.querySelectorAll('.table-responsive');
+                        responsiveDivs.forEach(div => {
+                            div.style.overflow = 'visible';
+                            div.style.width = '100%';
+                        });
+                        
+                        areaClone.style.padding = '30px';
+                        areaClone.style.borderRadius = '0';
+                        areaClone.style.boxShadow = 'none';
+                    }
                 });
 
                 const imgData = canvas.toDataURL('image/png');
                 const jsPDF = window.jspdf.jsPDF;
+                
+                // Set PDF margin & orientasi
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`PDF_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+                pdf.save(`Material_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
             } catch (err) {
                 console.error(err);
                 alert("Terjadi kesalahan saat memproses PDF: " + err.message);
             } finally {
-                siapkanTampilanPrint(false); 
                 document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
                 btn.innerText = teksAsli;
             }
