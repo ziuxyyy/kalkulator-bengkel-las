@@ -272,8 +272,20 @@
             renderTabel();
         }
 
+        // ==========================================
+        // FUNGSI PROYEK YANG SUDAH DIPERBAIKI
+        // ==========================================
         function gantiProyek() {
+            // 1. Simpan tabel saat ini ke dalam array proyek lama
+            projects[currentProject] = dataMaterial; 
+            
+            // 2. Ganti nama proyek aktif
             currentProject = document.getElementById('projectSelector').value;
+            
+            // 3. Tarik isi tabel untuk proyek yang baru
+            dataMaterial = projects[currentProject] || [];
+            
+            // 4. Simpan perubahan ke Cloud
             simpanKeCloud();
         }
 
@@ -281,7 +293,17 @@
             let nama = prompt("Masukkan nama proyek baru:");
             if (nama && nama.trim() !== "") {
                 if (projects[nama]) return alert("Nama proyek sudah ada!");
-                projects[nama] = []; currentProject = nama; 
+                
+                // Simpan data proyek yang lama dulu
+                projects[currentProject] = dataMaterial; 
+                
+                // Bikin proyek baru dan langsung jadikan proyek aktif
+                projects[nama] = []; 
+                currentProject = nama; 
+                
+                // Siapkan tabel kosong untuk proyek baru
+                dataMaterial = projects[currentProject];
+                
                 simpanKeCloud();
             }
         }
@@ -290,8 +312,16 @@
             let namaBaru = prompt("Ubah nama proyek:", currentProject);
             if (namaBaru && namaBaru.trim() !== "" && namaBaru !== currentProject) {
                 if (projects[namaBaru]) return alert("Nama tersebut sudah dipakai!");
+                
+                // Pastikan data tersimpan di nama lama
+                projects[currentProject] = dataMaterial; 
+                
+                // Salin data ke nama baru, lalu hapus yang lama
                 projects[namaBaru] = projects[currentProject];
-                delete projects[currentProject]; currentProject = namaBaru;
+                delete projects[currentProject]; 
+                
+                currentProject = namaBaru;
+                
                 simpanKeCloud();
             }
         }
@@ -299,11 +329,20 @@
         function hapusProyek() {
             if (Object.keys(projects).length <= 1) return alert("Minimal harus ada 1 proyek.");
             if (confirm(`Yakin ingin menghapus seluruh data pada "${currentProject}"?`)) {
+                
+                // Hapus proyek saat ini
                 delete projects[currentProject];
+                
+                // Pindah ke proyek pertama yang tersisa di daftar
                 currentProject = Object.keys(projects)[0];
+                
+                // Tarik data tabel dari proyek tersebut
+                dataMaterial = projects[currentProject] || []; 
+                
                 simpanKeCloud();
             }
         }
+        // ==========================================
 
         function bersihkanTabel() {
             if (confirm("Hapus semua rincian di tabel ini?")) {
