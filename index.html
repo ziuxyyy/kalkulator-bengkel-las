@@ -3,61 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Material - Bengkel Las Ajaib (Supabase)</title>
+    <title>Kalkulator Material - Bengkel Las Ajaib</title>
     
     <!-- Library Eksternal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; background: #f4f7f6; color: #333; line-height: 1.6; margin: 0; }
         .container { max-width: 1050px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         
         /* LOGIN SCREEN */
-        #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #1e293b; color: white; position: fixed; top:0; left:0; width:100%; z-index: 9999; }
+        #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #2c3e50; color: white; position: fixed; top:0; left:0; width:100%; z-index: 9999; }
         #loginScreen h1 { font-size: 32px; margin-bottom: 5px; text-align: center;}
-        #loginScreen p { margin-bottom: 20px; color: #94a3b8; }
+        #loginScreen p { margin-bottom: 20px; color: #bdc3c7; }
         #loginScreen input { padding: 12px; margin-bottom: 15px; width: 280px; border-radius: 5px; border: none; outline: none; font-size: 14px; text-align: center; color: #333;}
-        #loginScreen input:focus { box-shadow: 0 0 8px rgba(14, 165, 233, 0.8); }
-        .btn-login { background: #0ea5e9; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 305px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.2s;}
-        .btn-login:hover { background: #0284c7; }
+        #loginScreen input:focus { box-shadow: 0 0 8px rgba(52, 152, 219, 0.8); }
+        .btn-login { background: #e74c3c; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 305px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.2s;}
+        .btn-login:hover { background: #c0392b; }
         
         #appContent { display: none; }
 
         .header-bar { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
-        .title-bengkel { color: #1e293b; font-size: 24px; margin: 0; font-weight: 900; letter-spacing: 1px;}
+        .title-bengkel { color: #2c3e50; font-size: 24px; margin: 0; font-weight: 900; letter-spacing: 1px;}
         
-        .user-info { font-size: 13px; font-weight: bold; color: #64748b; display: flex; align-items: center; gap: 10px;}
-        .btn-logout { background: #64748b; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; border: none; cursor: pointer;}
+        .user-info { font-size: 13px; font-weight: bold; color: #7f8c8d; display: flex; align-items: center; gap: 10px;}
+        .btn-logout { background: #7f8c8d; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; border: none; cursor: pointer;}
         
-        .project-manager { background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bae6fd; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .project-manager { background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d1e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .project-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%;}
         select, input[type="text"], input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; width: 100%;}
         
         button { cursor: pointer; border: none; border-radius: 5px; font-weight: bold; padding: 8px 12px; font-size: 13px; transition: 0.2s;}
         
-        .btn-proj-new { background: #10b981; color: white; }
-        .btn-proj-rename { background: #f59e0b; color: white; }
-        .btn-proj-del { background: #ef4444; color: white; }
+        .btn-proj-new { background: #27ae60; color: white; }
+        .btn-proj-rename { background: #f39c12; color: white; }
+        .btn-proj-del { background: #c0392b; color: white; }
         
-        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 5px; }
-        .btn-tambah { background: #10b981; color: white; align-self: end; height: 38px;}
+        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
+        label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
+        .btn-tambah { background: #27ae60; color: white; align-self: end; height: 38px;}
 
-        h2 { color: #334155; font-size: 16px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+        h2 { color: #34495e; font-size: 16px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
         
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; min-width: 600px; }
-        th, td { border: 1px solid #cbd5e1 !important; padding: 8px; text-align: left; }
-        th { background-color: #1e293b; color: white; position: sticky; top: 0;}
-        tr:nth-child(even) { background-color: #f8fafc; }
+        th, td { border: 1px solid #ddd !important; padding: 8px; text-align: left; }
+        th { background-color: #2c3e50; color: white; position: sticky; top: 0;}
+        tr:nth-child(even) { background-color: #f9f9f9; }
         
-        [contenteditable="true"] { background-color: #fef08a; border: 1px dashed #f59e0b !important; min-width: 40px; }
-        .delete-btn { background: #ef4444; color: white; padding: 5px 10px; font-size: 11px; }
-        .status-save { font-size: 12px; color: #10b981; font-weight: bold; background: #ecfdf5; padding: 5px 10px; border-radius: 15px; display: inline-block;}
+        [contenteditable="true"] { background-color: #fffde7; border: 1px dashed #f39c12 !important; min-width: 40px; }
+        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; font-size: 11px; }
+        .status-save { font-size: 12px; color: #27ae60; font-weight: bold; background: #e8f8f5; padding: 5px 10px; border-radius: 15px; display: inline-block;}
 
         @media (max-width: 600px) {
             .header-bar { flex-direction: column; }
@@ -71,13 +73,13 @@
     <!-- LAYAR LOGIN USERNAME & PASSWORD -->
     <div id="loginScreen">
         <h1>BENGKEL LAS AJAIB</h1>
-        <p>Silakan Masuk Untuk Mengakses Data (Supabase)</p>
+        <p>Silakan Masuk Untuk Mengakses Data</p>
         
-        <input type="email" id="emailInput" placeholder="Masukkan Email">
+        <input type="email" id="emailInput" placeholder="Masukkan Email (Cth: bos@bengkel.com)">
         <input type="password" id="passwordInput" placeholder="Masukkan Password">
         
         <button class="btn-login" onclick="loginManual()">Masuk</button>
-        <div id="loginError" style="color: #f87171; margin-top: 15px; font-size: 14px; text-align:center;"></div>
+        <div id="loginError" style="color: #ff7675; margin-top: 15px; font-size: 14px; text-align:center;"></div>
     </div>
 
     <!-- KONTEN APLIKASI -->
@@ -127,7 +129,7 @@
             </div>
         </div>
 
-        <h2><span>Rincian Kebutuhan</span> <button style="background:#ef4444; color:white;" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button></h2>
+        <h2><span>Rincian Kebutuhan</span> <button style="background:#e74c3c; color:white;" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button></h2>
         <div class="table-responsive">
             <table id="tableRincian">
                 <thead>
@@ -137,7 +139,7 @@
             </table>
         </div>
 
-        <h2><span>Rekapitulasi Belanja</span> <button style="background:#0d9488; color:white;" onclick="exportTableToCSV('tableRekap', 'Rekap.csv')">📤 Export .csv</button></h2>
+        <h2><span>Rekapitulasi Belanja</span> <button style="background:#16a085; color:white;" onclick="exportTableToCSV('tableRekap', 'Rekap.csv')">📤 Export .csv</button></h2>
         <div class="table-responsive">
             <table id="tableRekap">
                 <thead>
@@ -149,154 +151,103 @@
     </div>
 
     <script>
-        // KONFIGURASI SUPABASE (Ganti dengan URL & Anon Key project Anda)
-        const SUPABASE_URL = 'https://URL_PROJECT_ANDA.supabase.co';
-        const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_ANDA';
+        const firebaseConfig = {
+          apiKey: "AIzaSyC4zqHJlBGXwPCMXvkEGt2OzT9aghb7CAs",
+          authDomain: "bengkel-las-ajaib.firebaseapp.com",
+          projectId: "bengkel-las-ajaib",
+          storageBucket: "bengkel-las-ajaib.firebasestorage.app",
+          messagingSenderId: "115215576003",
+          appId: "1:115215576003:web:f3a91e8e83946dee9e2b76",
+          measurementId: "G-2JWXY1E2TL"
+        };
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
         let projects = { "Proyek Utama": [] };
         let currentProject = "Proyek Utama";
         let dataMaterial = []; 
-        let isSyncing = false;
 
-        // Cek Sesi Auth saat halaman dimuat
-        supabaseClient.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                tampilkanAplikasi(session.user.email);
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('userName').innerText = user.email;
+                mulaiRealtimeSync(); 
             } else {
-                tampilkanLogin();
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('appContent').style.display = 'none';
             }
         });
 
-        // Listener perubahan Auth State Supabase
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (session) {
-                tampilkanAplikasi(session.user.email);
-            } else {
-                tampilkanLogin();
-            }
-        });
-
-        function tampilkanAplikasi(email) {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-            document.getElementById('userName').innerText = email;
-            ambilDataDariCloud();
-            mulaiRealtimeSync();
-        }
-
-        function tampilkanLogin() {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('appContent').style.display = 'none';
-        }
-
-        async function loginManual() {
+        function loginManual() {
             const email = document.getElementById('emailInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
             const errorDiv = document.getElementById('loginError');
 
             if(!email || !password) {
                 errorDiv.innerText = "Email dan password tidak boleh kosong!";
-                errorDiv.style.color = "#f87171";
+                errorDiv.style.color = "#ff7675";
                 return;
             }
 
             errorDiv.innerText = "⏳ Sedang memeriksa...";
-            errorDiv.style.color = "#38bdf8";
+            errorDiv.style.color = "#3498db";
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                errorDiv.style.color = "#f87171";
-                errorDiv.innerText = "⚠️ Login Gagal! Pastikan Email dan Password benar.";
-            } else {
-                errorDiv.innerText = ""; 
-            }
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    errorDiv.innerText = ""; 
+                })
+                .catch((error) => {
+                    errorDiv.style.color = "#ff7675";
+                    errorDiv.innerText = "⚠️ Login Gagal! Pastikan Email dan Password benar.";
+                });
         }
 
-        async function logoutManual() { 
-            await supabaseClient.auth.signOut();
+        function logoutManual() { 
+            auth.signOut(); 
             document.getElementById('emailInput').value = ""; 
             document.getElementById('passwordInput').value = "";
         }
 
-        async function ambilDataDariCloud() {
-            const status = document.getElementById('saveStatus');
-            status.innerText = "⏳ Memuat data..."; 
-            status.style.color = "#d97706";
-
-            const { data, error } = await supabaseClient
-                .from('bengkel_data')
-                .select('*')
-                .eq('key', 'data_kalkulator')
-                .single();
-
-            if (data) {
-                if (data.projects) projects = data.projects;
-                if (data.current_project && projects[data.current_project]) {
-                    currentProject = data.current_project;
-                } else {
-                    currentProject = Object.keys(projects)[0];
-                }
-            } else {
-                // Jika data belum ada di database, inisialisasi awal
-                projects = { "Proyek Utama": [] };
-                currentProject = "Proyek Utama";
-                await simpanKeCloud();
-            }
-            updateProjectUI();
-            
-            status.innerText = "🟢 Real-time aktif"; 
-            status.style.color = "#10b981";
-        }
-
         function mulaiRealtimeSync() {
-            supabaseClient
-                .channel('public:bengkel_data')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'bengkel_data' }, payload => {
-                    if (!isSyncing && payload.new && payload.new.key === 'data_kalkulator') {
-                        const cloudData = payload.new;
-                        if (cloudData.projects) {
-                            projects = cloudData.projects;
-                        }
-                        if (cloudData.current_project && projects[cloudData.current_project]) {
-                            currentProject = cloudData.current_project;
-                        }
-                        updateProjectUI();
+            db.collection("bengkel").doc("data_kalkulator").onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.projects) {
+                        projects = data.projects;
                     }
-                })
-                .subscribe();
+                    if (data.currentProject && projects[data.currentProject]) {
+                        currentProject = data.currentProject;
+                    } else {
+                        currentProject = Object.keys(projects)[0];
+                    }
+                } else {
+                    projects = { "Proyek Utama": [] };
+                    currentProject = "Proyek Utama";
+                    simpanKeCloud();
+                }
+                updateProjectUI();
+                
+                const status = document.getElementById('saveStatus');
+                status.innerText = "🟢 Real-time aktif"; 
+                status.style.color = "#27ae60";
+            });
         }
 
-        async function simpanKeCloud() {
+        function simpanKeCloud() {
             projects[currentProject] = dataMaterial; 
             const status = document.getElementById('saveStatus');
-            status.innerText = "⏳ Menyimpan..."; 
-            status.style.color = "#d97706";
+            status.innerText = "⏳ Menyimpan..."; status.style.color = "#d35400";
             
-            isSyncing = true;
-            const { error } = await supabaseClient
-                .from('bengkel_data')
-                .upsert({ 
-                    key: 'data_kalkulator', 
-                    projects: projects, 
-                    current_project: currentProject,
-                    updated_at: new Date()
-                }, { onConflict: 'key' });
-
-            isSyncing = false;
-            
-            if (!error) {
-                status.innerText = "🟢 Real-time aktif"; 
-                status.style.color = "#10b981";
-            } else {
-                status.innerText = "⚠️ Gagal Menyimpan"; 
-                status.style.color = "#ef4444";
-            }
+            db.collection("bengkel").doc("data_kalkulator").set({
+                projects: projects,
+                currentProject: currentProject,
+                terakhirDiupdate: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                status.innerText = "🟢 Real-time aktif"; status.style.color = "#27ae60";
+            });
         }
 
         function updateProjectUI() {
@@ -445,27 +396,8 @@
                 } else if (data.tipe === 'baut') {
                     teksStandar = '-'; teksKebutuhan = `${data.totalKebutuhan} Pcs`; teksBeli = `${data.totalKebutuhan} Pcs`; teksSisa = '-';
                 }
-                tbodyRekap.innerHTML += `<tr><td><strong>${data.tipe.toUpperCase()}</strong></td><td>${data.jenis}</td><td>${teksStandar}</td><td>${teksKebutuhan}</td><td style="color:#10b981; font-weight:bold;">${teksBeli}</td><td>${teksSisa}</td></tr>`;
+                tbodyRekap.innerHTML += `<tr><td><strong>${data.tipe.toUpperCase()}</strong></td><td>${data.jenis}</td><td>${teksStandar}</td><td>${teksKebutuhan}</td><td style="color:#27ae60; font-weight:bold;">${teksBeli}</td><td>${teksSisa}</td></tr>`;
             }
-        }
-
-        // Fungsi pembantu untuk export CSV (jika diperlukan)
-        function exportTableToCSV(tableID, filename) {
-            let csv = [];
-            let rows = document.querySelectorAll("#" + tableID + " tr");
-            for (let i = 0; i < rows.length; i++) {
-                let row = [], cols = rows[i].querySelectorAll("td, th");
-                for (let j = 0; j < cols.length; j++) row.push('"' + cols[j].innerText + '"');
-                csv.push(row.join(","));
-            }
-            let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
-            let downloadLink = document.createElement("a");
-            downloadLink.download = filename;
-            downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
         }
         
         window.onload = function() { toggleForm(); };
