@@ -87,7 +87,7 @@
     <!-- HALAMAN LOGIN / AUTH -->
     <div id="authContainer" class="container" style="max-width: 400px; margin-top: 80px; text-align: center;">
         <h2 style="justify-content: center; color: #2c3e50; margin-bottom: 20px;">🔐 Login Bengkel Las</h2>
-        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Masukkan email & password untuk sinkronisasi cloud secara real-time.</p>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Masukkan email & password yang sudah terdaftar di Supabase.</p>
         <div style="text-align: left; margin-bottom: 12px;">
             <label>Email</label>
             <input type="email" id="email" placeholder="nama@email.com">
@@ -96,7 +96,7 @@
             <label>Password</label>
             <input type="password" id="password" placeholder="••••••••">
         </div>
-        <button onclick="loginUser()" style="background: #27ae60; color: white; width: 100%; padding: 12px; font-size: 15px;">Login / Daftar Akun Baru</button>
+        <button onclick="loginUser()" style="background: #27ae60; color: white; width: 100%; padding: 12px; font-size: 15px;">Login</button>
     </div>
 
     <!-- HALAMAN APLIKASI UTAMA (Disembunyikan sebelum login) -->
@@ -238,16 +238,17 @@
         async function loginUser() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-            if(!email || !password) return alert("Email dan password wajib diisi!");
+            
+            if(!email || !password) {
+                alert("Email dan password wajib diisi!");
+                return;
+            }
 
+            // Hanya melakukan proses login (SignIn) tanpa pendaftaran otomatis
             let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
             if (error) {
-                let { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
-                if (signUpError) {
-                    alert("Gagal Login/Register: " + signUpError.message);
-                } else {
-                    alert("Akun berhasil dibuat & langsung masuk!");
-                }
+                alert("Login Gagal: Pastikan email dan password sudah terdaftar secara manual di Supabase! (" + error.message + ")");
             }
         }
 
