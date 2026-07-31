@@ -113,6 +113,7 @@
             <button class="btn-undo" onclick="undoAksi()">↩️ Undo</button>
             <button class="btn-redo" onclick="redoAksi()">↪️ Redo</button>
             <span style="flex-grow:1"></span>
+            
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
             <button class="btn-import" onclick="document.getElementById('importFile').click()">📥 Import Proyek</button>
             <button class="btn-export" onclick="exportJSON()">📤 Export Proyek</button>
@@ -152,7 +153,7 @@
 
         <!-- AREA PRINT (Untuk keperluan Export Gambar & PDF) -->
         <div id="areaPrint">
-            <h2 id="judulPrint" style="display:none; text-align:center; color:black;">Data Proyek</h2>
+            <h2 id="judulPrint" style="display:none; text-align:center; color:black; margin-bottom:15px; font-size:20px; font-weight:bold;">Data Proyek</h2>
             
             <h2><span>Rincian Kebutuhan</span> <button style="background:#e74c3c; color:white;" class="hide-on-print" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button></h2>
             <div class="table-responsive">
@@ -167,8 +168,8 @@
             <h2>
                 <span>Rekapitulasi Belanja</span> 
                 <div class="hide-on-print">
-                    <button class="btn-img" onclick="exportGambar()">📸 Export Gambar</button>
-                    <button class="btn-pdf" onclick="exportPDF()">📄 Export PDF</button>
+                    <button class="btn-img" id="btnExportImg" onclick="exportGambar()">📸 Export Gambar</button>
+                    <button class="btn-pdf" id="btnExportPdf" onclick="exportPDF()">📄 Export PDF</button>
                 </div>
             </h2>
             <div class="table-responsive">
@@ -199,63 +200,124 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const { jsPDF } = window.jspdf; // Inisialisasi jsPDF
 
-        // Variabel Database
+        // Variabel Database Bersama
         let projects = { "Proyek Utama": [] };
         let currentProject = "Proyek Utama";
         let dataMaterial = []; 
 
-        // Variabel Undo/Redo
         let historyStack = [];
         let redoStack = [];
+
+        // ==========================================
+        // SETUP NAVIGASI KEYBOARD 
+        // ==========================================
+        function setupKeyboardNavigation() {
+            const inputForm = document.getElementById('inputForm');
+            inputForm.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const inputs = Array.from(inputForm.querySelectorAll('input')).filter(el => el.parentElement.style.display !== 'none');
+                    const currentIndex = inputs.indexOf(e.target);
+                    
+                    if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+                        inputs[currentIndex + 1].focus();
+                    } else if (currentIndex === inputs.length - 1) {
+                        tambahItem();
+                    }
+                }
+            });
+
+            document.getElementById('tableRincian').addEventListener('keydown', function(e) {
+                if (!e.target.hasAttribute('contenteditable')) return;
+                
+                const cell = e.target;
+                const row = cell.parentElement;
+                const cellIndex = Array.from(row.children).indexOf(cell);
+                let nextCell = null;
+                
+                if (e.key === 'Enter') {
+                    e.preventDefault(); 
+                    nextCell = cell.nextElementSibling;
+                    while(nextCell && !nextCell.hasAttribute('contenteditable')) {
+                        nextCell = nextCell.nextElementSibling;
+                    }
+                    if(!nextCell && row.nextElementSibling) {
+                        nextCell = row.nextElementSibling.querySelector('[contenteditable="true"]');
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevRow = row.previousElementSibling;
+                    if (prevRow) nextCell = prevRow.children[cellIndex];
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextRow = row.nextElementSibling;
+                    if (nextRow) nextCell = nextRow.children[cellIndex];
+                }
+                
+                if (nextCell && nextCell.hasAttribute('contenteditable')) {
+                    nextCell.focus();
+                    let range = document.createRange();
+                    range.selectNodeContents(nextCell);
+                    range.collapse(false); 
+                    let sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            });
+        }
 
         // ==========================================
         // SISTEM UNDO & REDO
         // ==========================================
         function simpanStatusUndo() {
-            // Rekam keadaan sebelum melakukan aksi
-            historyStack.push({
-                projectsData: JSON.parse(JSON.stringify(projects)), 
-                activeProject: currentProject
-            });
-            if(historyStack.length > 20) historyStack.shift(); // Batas memori 20 langkah
-            redoStack = []; // Bersihkan redo setiap ada aksi baru
+            historyStack.push({ projectsData: JSON.parse(JSON.stringify(projects)), activeProject: currentProject });
+            if(historyStack.length > 20) historyStack.shift(); 
+            redoStack = []; 
         }
 
         function undoAksi() {
             if(historyStack.length === 0) return alert("Tidak ada data untuk di-undo!");
-            
             redoStack.push({ projectsData: JSON.parse(JSON.stringify(projects)), activeProject: currentProject });
             let statusSblm = historyStack.pop();
-            
             projects = statusSblm.projectsData;
             currentProject = statusSblm.activeProject;
             
-            simpanKeCloud(false); // Simpan tanpa menambah undo state
+            const selector = document.getElementById('projectSelector');
+            selector.value = currentProject;
+            dataMaterial = projects[currentProject] || [];
+            simpanKeCloud(); 
         }
 
         function redoAksi() {
             if(redoStack.length === 0) return alert("Tidak ada data untuk di-redo!");
-            
             historyStack.push({ projectsData: JSON.parse(JSON.stringify(projects)), activeProject: currentProject });
             let statusMaju = redoStack.pop();
-            
             projects = statusMaju.projectsData;
             currentProject = statusMaju.activeProject;
             
-            simpanKeCloud(false);
+            const selector = document.getElementById('projectSelector');
+            selector.value = currentProject;
+            dataMaterial = projects[currentProject] || [];
+            simpanKeCloud();
         }
 
         // ==========================================
         // SISTEM IMPORT & EXPORT JSON
         // ==========================================
         function exportJSON() {
-            const jsonText = JSON.stringify(projects, null, 2);
+            const projectData = {
+                projectName: currentProject,
+                items: projects[currentProject] || []
+            };
+            
+            const jsonText = JSON.stringify(projectData, null, 2);
             const blob = new Blob([jsonText], { type: "application/json" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `Backup_Bengkel_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const safeName = currentProject.replace(/[^a-zA-Z0-9]/g, '_');
+            link.download = `Proyek_${safeName}.json`;
             link.click();
         }
 
@@ -263,21 +325,45 @@
             const file = event.target.files[0];
             if(!file) return;
             const reader = new FileReader();
+            
             reader.onload = function(e) {
                 try {
                     const dataMasuk = JSON.parse(e.target.result);
+                    
+                    if (!dataMasuk.projectName || !Array.isArray(dataMasuk.items)) {
+                        alert("Format file tidak valid! Pastikan ini adalah file hasil Export Proyek.");
+                        return;
+                    }
+
                     simpanStatusUndo();
-                    projects = dataMasuk;
-                    currentProject = Object.keys(projects)[0] || "Proyek Utama";
-                    simpanKeCloud(false);
-                    alert("Proyek berhasil di-import!");
-                } catch (err) { alert("File tidak valid atau rusak!"); }
+                    
+                    let namaBaru = dataMasuk.projectName;
+                    let counter = 1;
+                    
+                    while (projects[namaBaru]) {
+                        namaBaru = `${dataMasuk.projectName} (${counter})`;
+                        counter++;
+                    }
+
+                    projects[namaBaru] = dataMasuk.items;
+                    currentProject = namaBaru;
+                    dataMaterial = projects[currentProject];
+                    
+                    updateProjectDropdown();
+                    simpanKeCloud();
+                    
+                    alert(`Proyek berhasil di-import sebagai: ${namaBaru}`);
+                } catch (err) { 
+                    alert("File tidak valid atau rusak!"); 
+                }
+                
+                document.getElementById('importFile').value = '';
             };
             reader.readAsText(file);
         }
 
         // ==========================================
-        // SISTEM EXPORT PDF & GAMBAR (PRINT)
+        // SISTEM EXPORT PDF & GAMBAR (METODE ASYNC AWAIT - PALING STABIL)
         // ==========================================
         function siapkanTampilanPrint(status) {
             const sembunyi = document.querySelectorAll('.hide-on-print');
@@ -288,36 +374,85 @@
             judul.style.display = status ? 'block' : 'none';
         }
 
-        function exportGambar() {
-            siapkanTampilanPrint(true);
-            const area = document.getElementById('areaPrint');
-            html2canvas(area, { scale: 2 }).then(canvas => {
+        async function exportGambar() {
+            const btn = document.getElementById('btnExportImg');
+            const teksAsli = btn.innerText;
+            btn.innerText = "⏳ Memproses...";
+
+            try {
+                window.scrollTo(0, 0); // Scroll ke atas
+                siapkanTampilanPrint(true); // Sembunyikan elemen secara real-time
+
+                // Matikan overflow agar tabel tidak terpotong di HP/Layar kecil
+                const tables = document.querySelectorAll('.table-responsive');
+                tables.forEach(t => t.style.overflow = 'visible');
+
+                // Jeda 500ms agar browser selesai menerapkan perubahan layar sebelum difoto
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const area = document.getElementById('areaPrint');
+                const canvas = await html2canvas(area, {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
+                    useCORS: true
+                });
+
                 const link = document.createElement('a');
-                link.download = `${currentProject}.png`;
+                link.download = `Gambar_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                siapkanTampilanPrint(false);
-            });
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan saat memproses gambar: " + err.message);
+            } finally {
+                // Kembalikan layar seperti semula
+                siapkanTampilanPrint(false); 
+                document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
+                btn.innerText = teksAsli;
+            }
         }
 
-        function exportPDF() {
-            siapkanTampilanPrint(true);
-            const area = document.getElementById('areaPrint');
-            html2canvas(area, { scale: 2 }).then(canvas => {
+        async function exportPDF() {
+            const btn = document.getElementById('btnExportPdf');
+            const teksAsli = btn.innerText;
+            btn.innerText = "⏳ Memproses...";
+
+            try {
+                window.scrollTo(0, 0);
+                siapkanTampilanPrint(true); 
+
+                const tables = document.querySelectorAll('.table-responsive');
+                tables.forEach(t => t.style.overflow = 'visible');
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const area = document.getElementById('areaPrint');
+                const canvas = await html2canvas(area, {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
+                    useCORS: true
+                });
+
                 const imgData = canvas.toDataURL('image/png');
+                const jsPDF = window.jspdf.jsPDF;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
+
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`${currentProject}.pdf`);
-                siapkanTampilanPrint(false);
-            });
+                pdf.save(`PDF_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan saat memproses PDF: " + err.message);
+            } finally {
+                siapkanTampilanPrint(false); 
+                document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
+                btn.innerText = teksAsli;
+            }
         }
 
-
         // ==========================================
-        // LOGIN & SINKRONISASI
+        // LOGIN & SINKRONISASI PINTAR
         // ==========================================
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -341,7 +476,6 @@
                 errorDiv.style.color = "#ff7675";
                 return;
             }
-
             errorDiv.innerText = "⏳ Sedang memeriksa...";
             errorDiv.style.color = "#3498db";
 
@@ -356,18 +490,30 @@
             db.collection("bengkel").doc("data_kalkulator").onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
-                    if (data.projects) projects = data.projects;
-                    if (data.currentProject && projects[data.currentProject]) {
-                        currentProject = data.currentProject;
-                    } else {
-                        currentProject = Object.keys(projects)[0];
+                    if (data.projects) {
+                        if (JSON.stringify(projects) === JSON.stringify(data.projects)) return;
+                        
+                        const isCurrentProjectChanged = JSON.stringify(projects[currentProject]) !== JSON.stringify(data.projects[currentProject]);
+                        projects = data.projects;
+                        
+                        if (!projects[currentProject]) {
+                            currentProject = Object.keys(projects)[0] || "Proyek Utama";
+                            updateProjectDropdown();
+                            dataMaterial = projects[currentProject] || [];
+                            renderTabel();
+                        } else {
+                            updateProjectDropdown();
+                            dataMaterial = projects[currentProject];
+                            if (isCurrentProjectChanged) {
+                                renderTabel();
+                            }
+                        }
                     }
                 } else {
                     projects = { "Proyek Utama": [] };
                     currentProject = "Proyek Utama";
-                    simpanKeCloud(false);
+                    simpanKeCloud();
                 }
-                updateProjectUI();
                 
                 const status = document.getElementById('saveStatus');
                 status.innerText = "🟢 Real-time aktif"; 
@@ -378,20 +524,18 @@
         // ==========================================
         // MANAJEMEN DATA & UI
         // ==========================================
-        function simpanKeCloud(tambahUndo = true) {
-            if(tambahUndo) simpanStatusUndo();
+        function simpanKeCloud() {
             projects[currentProject] = dataMaterial; 
             const status = document.getElementById('saveStatus');
             status.innerText = "⏳ Menyimpan..."; status.style.color = "#d35400";
             
             db.collection("bengkel").doc("data_kalkulator").set({
                 projects: projects,
-                currentProject: currentProject,
                 terakhirDiupdate: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => { status.innerText = "🟢 Real-time aktif"; status.style.color = "#27ae60"; });
         }
 
-        function updateProjectUI() {
+        function updateProjectDropdown() {
             const selector = document.getElementById('projectSelector');
             selector.innerHTML = '';
             for (let proj in projects) {
@@ -399,19 +543,13 @@
                 opt.value = proj; opt.innerText = proj;
                 selector.appendChild(opt);
             }
-            
-            // Langsung fokus (menuju) ke proyek yang sedang aktif
             selector.value = currentProject;
-            dataMaterial = projects[currentProject] || [];
-            renderTabel();
         }
 
         function gantiProyek() {
-            simpanStatusUndo();
-            projects[currentProject] = dataMaterial; 
             currentProject = document.getElementById('projectSelector').value;
             dataMaterial = projects[currentProject] || [];
-            simpanKeCloud(false);
+            renderTabel(); 
         }
 
         function buatProyekBaru() {
@@ -423,7 +561,8 @@
                 projects[nama] = []; 
                 currentProject = nama; 
                 dataMaterial = projects[currentProject];
-                simpanKeCloud(false);
+                updateProjectDropdown();
+                simpanKeCloud();
             }
         }
 
@@ -436,7 +575,9 @@
                 projects[namaBaru] = projects[currentProject];
                 delete projects[currentProject]; 
                 currentProject = namaBaru;
-                simpanKeCloud(false);
+                dataMaterial = projects[currentProject];
+                updateProjectDropdown();
+                simpanKeCloud();
             }
         }
 
@@ -447,12 +588,14 @@
                 delete projects[currentProject];
                 currentProject = Object.keys(projects)[0];
                 dataMaterial = projects[currentProject] || []; 
-                simpanKeCloud(false);
+                updateProjectDropdown();
+                simpanKeCloud();
             }
         }
 
         function bersihkanTabel() {
             if (confirm("Hapus semua rincian di tabel ini?")) {
+                simpanStatusUndo();
                 dataMaterial = [];
                 simpanKeCloud();
             }
@@ -480,6 +623,7 @@
 
             if (!jenis || qty <= 0) return alert("Jenis dan Qty wajib diisi!");
             
+            simpanStatusUndo();
             dataMaterial.push({ id: Date.now(), tipe, jenis, bagian, p, l, qty, stdP, stdL });
             
             document.getElementById('bagian').value = ''; 
@@ -490,6 +634,7 @@
         }
 
         function hapusItem(id) { 
+            simpanStatusUndo();
             dataMaterial = dataMaterial.filter(item => item.id !== id); 
             simpanKeCloud(); 
         }
@@ -499,6 +644,7 @@
             if(item) {
                 let parsedVal = ['p','l','qty','stdP','stdL'].includes(field) ? (parseFloat(value) || 0) : value.trim();
                 if (item[field] !== parsedVal) { 
+                    simpanStatusUndo();
                     item[field] = parsedVal; 
                     simpanKeCloud(); 
                 }
@@ -553,7 +699,10 @@
             }
         }
         
-        window.onload = function() { toggleForm(); };
+        window.onload = function() { 
+            toggleForm(); 
+            setupKeyboardNavigation();
+        };
     </script>
 </body>
 </html>
