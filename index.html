@@ -7,7 +7,8 @@
     
     <!-- Library Eksternal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- MENGGANTI HTML2CANVAS LAMA DENGAN VERSI PRO UNTUK FIX BUG 'OKLAB' -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro/dist/html2canvas-pro.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- Firebase SDK -->
@@ -363,7 +364,7 @@
         }
 
         // ==========================================
-        // SISTEM EXPORT PDF & GAMBAR (METODE ASYNC AWAIT - PALING STABIL)
+        // SISTEM EXPORT PDF & GAMBAR (FIX OKLAB BUG)
         // ==========================================
         function siapkanTampilanPrint(status) {
             const sembunyi = document.querySelectorAll('.hide-on-print');
@@ -380,21 +381,21 @@
             btn.innerText = "⏳ Memproses...";
 
             try {
-                window.scrollTo(0, 0); // Scroll ke atas
-                siapkanTampilanPrint(true); // Sembunyikan elemen secara real-time
+                window.scrollTo(0, 0); 
+                siapkanTampilanPrint(true); 
 
-                // Matikan overflow agar tabel tidak terpotong di HP/Layar kecil
                 const tables = document.querySelectorAll('.table-responsive');
                 tables.forEach(t => t.style.overflow = 'visible');
 
-                // Jeda 500ms agar browser selesai menerapkan perubahan layar sebelum difoto
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 const area = document.getElementById('areaPrint');
+                // Panggil html2canvas langsung dari library html2canvas-pro
                 const canvas = await html2canvas(area, {
                     scale: 2,
                     backgroundColor: "#ffffff",
-                    useCORS: true
+                    useCORS: true,
+                    allowTaint: true
                 });
 
                 const link = document.createElement('a');
@@ -405,7 +406,6 @@
                 console.error(err);
                 alert("Terjadi kesalahan saat memproses gambar: " + err.message);
             } finally {
-                // Kembalikan layar seperti semula
                 siapkanTampilanPrint(false); 
                 document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
                 btn.innerText = teksAsli;
@@ -430,7 +430,8 @@
                 const canvas = await html2canvas(area, {
                     scale: 2,
                     backgroundColor: "#ffffff",
-                    useCORS: true
+                    useCORS: true,
+                    allowTaint: true
                 });
 
                 const imgData = canvas.toDataURL('image/png');
