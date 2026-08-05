@@ -3,755 +3,984 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Material - Bengkel Las Ajaib</title>
-    
-    <!-- Library Eksternal -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas-pro/dist/html2canvas-pro.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
+    <title>Portofolio | Mochamad Ali Haidar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; background: #f4f7f6; color: #333; line-height: 1.6; margin: 0; }
-        .container { max-width: 1050px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        
-        /* LOGIN SCREEN */
-        #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #2c3e50; color: white; position: fixed; top:0; left:0; width:100%; z-index: 9999; }
-        #loginScreen h1 { font-size: 32px; margin-bottom: 5px; text-align: center;}
-        #loginScreen p { margin-bottom: 20px; color: #bdc3c7; }
-        #loginScreen input { padding: 12px; margin-bottom: 15px; width: 280px; border-radius: 5px; border: none; outline: none; font-size: 14px; text-align: center; color: #333;}
-        #loginScreen input:focus { box-shadow: 0 0 8px rgba(52, 152, 219, 0.8); }
-        .btn-login { background: #e74c3c; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 305px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: 0.2s;}
-        .btn-login:hover { background: #c0392b; }
-        
-        #appContent { display: none; }
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --primary-color: #e11d48;
+            --secondary-color: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
 
-        .header-bar { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
-        .title-bengkel { color: #2c3e50; font-size: 24px; margin: 0; font-weight: 900; letter-spacing: 1px;}
-        
-        .user-info { font-size: 13px; font-weight: bold; color: #7f8c8d; display: flex; align-items: center; gap: 10px;}
-        .btn-logout { background: #7f8c8d; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; border: none; cursor: pointer;}
-        
-        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
-        
-        .project-manager { background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #d1e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .project-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%;}
-        select, input[type="text"], input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; width: 100%;}
-        
-        button { cursor: pointer; border: none; border-radius: 5px; font-weight: bold; padding: 8px 12px; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;}
-        
-        /* WARNA TOMBOL */
-        .btn-proj-new { background: #27ae60; color: white; }
-        .btn-proj-rename { background: #f39c12; color: white; }
-        .btn-proj-del { background: #c0392b; color: white; }
-        .btn-undo { background: #95a5a6; color: white; }
-        .btn-redo { background: #7f8c8d; color: white; }
-        .btn-import { background: #8e44ad; color: white; }
-        .btn-export { background: #2980b9; color: white; }
-        .btn-pdf { background: #c0392b; color: white; }
-        .btn-img { background: #d35400; color: white; }
-        
-        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
-        label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
-        .btn-tambah { background: #27ae60; color: white; align-self: end; height: 38px;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-        h2 { color: #34495e; font-size: 16px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
-        
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; min-width: 600px; }
-        th, td { border: 1px solid #ddd !important; padding: 8px; text-align: left; }
-        th { background-color: #2c3e50; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        
-        [contenteditable="true"] { background-color: #fffde7; border: 1px dashed #f39c12 !important; min-width: 40px; }
-        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; font-size: 11px; }
-        .status-save { font-size: 12px; color: #27ae60; font-weight: bold; background: #e8f8f5; padding: 5px 10px; border-radius: 15px; display: inline-block;}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
 
-        #areaPrint { background: white; padding: 10px; border-radius: 8px; }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-        @media (max-width: 600px) {
-            .header-bar { flex-direction: column; }
-            .project-manager { flex-direction: column; align-items: stretch; }
-            select { width: 100% !important; }
+        section {
+            padding: 80px 0;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-main);
+        }
+        
+        h2.section-title {
+            font-size: 2.2rem;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        h2.section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: var(--primary-color);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        .category-title {
+            font-size: 1.6rem;
+            color: var(--text-main);
+            margin: 50px 0 25px;
+            text-align: left;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9)), url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            padding-top: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero h1 span {
+            color: var(--primary-color);
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .hero .quote {
+            font-style: italic;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            color: var(--text-main);
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 15px;
+            text-align: left;
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .contact-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface-color);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-3px);
+            background: var(--secondary-color);
+            color: #fff;
+        }
+
+        .contact-item i {
+            color: var(--primary-color);
+        }
+        
+        .contact-item:hover i {
+            color: #fff;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about-text p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        .skills-wrapper {
+            background: var(--surface-color);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .skill-item {
+            margin-bottom: 25px;
+        }
+
+        .skill-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 12px;
+            background: #334155;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border-radius: 10px;
+        }
+
+        .tech-tags {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-tag {
+            background: #334155;
+            color: var(--text-main);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Experience Grid */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .timeline-card {
+            background: var(--surface-color);
+            padding: 30px;
+            border-radius: 15px;
+            border-top: 4px solid var(--secondary-color);
+            transition: transform 0.3s;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .timeline-card h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .timeline-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .date-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .timeline-card ul {
+            list-style-position: inside;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .timeline-card ul li {
+            margin-bottom: 8px;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background: var(--surface-color);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #334155;
+        }
+
+        .project-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .video-preview-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #0f172a;
+            overflow: hidden;
+        }
+
+        .video-preview-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            pointer-events: none;
+        }
+
+        .play-trigger-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+            z-index: 5;
+        }
+
+        .project-card:hover .play-trigger-overlay {
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .play-button-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 20px rgba(225, 29, 72, 0.5);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .project-card:hover .play-button-icon {
+            transform: scale(1.15);
+            background: #f43f5e;
+        }
+
+        .play-text {
+            margin-top: 12px;
+            color: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .project-content {
+            padding: 20px;
+        }
+
+        .project-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            word-wrap: break-word;
+        }
+        
+        .project-tag {
+            display: inline-block;
+            background: rgba(225, 29, 72, 0.2);
+            color: #fb7185;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Modal Lightbox Video Viewer */
+        .video-modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            padding: 3vh 3vw;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh; /* Tinggi dinamis menyesuaikan isi */
+            background: #0f172a;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border: 1px solid #334155;
+            animation: modalZoom 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalZoom {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            flex-shrink: 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #f8fafc;
+            max-width: 85%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            background: rgba(225, 29, 72, 0.1);
+            border: none;
+            color: #fb7185;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .modal-video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+            background: #000;
+        }
+
+        .modal-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Awards Section */
+        .awards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            background: linear-gradient(135deg, var(--surface-color), #0f172a);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid #334155;
+        }
+
+        .award-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #fbbf24;
+        }
+
+        .award-item h3 {
+            color: #fbbf24;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .award-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: var(--surface-color);
+            color: var(--text-muted);
+            border-top: 1px solid #334155;
+        }
+
+        @media(max-width: 768px) {
+            .about-content, .timeline-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            /* Perbaikan Full Layar Modal di HP */
+            .video-modal {
+                padding: 0; 
+            }
+            .modal-box {
+                max-width: 100%;
+                height: 100vh;
+                height: 100dvh; 
+                border-radius: 0;
+                border: none;
+            }
+            .video-modal.active .modal-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: rgba(15, 23, 42, 0.7);
+                backdrop-filter: blur(5px);
+                z-index: 10;
+                border: none;
+            }
+            .modal-video-container {
+                height: 100vh;
+                height: 100dvh;
+            }
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            .awards-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            body {
+                overflow-x: hidden;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- LAYAR LOGIN -->
-    <div id="loginScreen">
-        <h1>BENGKEL LAS AJAIB</h1>
-        <p>Silakan Masuk Untuk Mengakses Data</p>
-        
-        <input type="email" id="emailInput" placeholder="Masukkan Email (Cth: bos@bengkel.com)">
-        <input type="password" id="passwordInput" placeholder="Masukkan Password">
-        
-        <button class="btn-login" onclick="loginManual()">Masuk</button>
-        <div id="loginError" style="color: #ff7675; margin-top: 15px; font-size: 14px; text-align:center;"></div>
-    </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>HALO, AKU</h2>
+            <h1>ALI <span>HAIDAR</span> !</h1>
+            <h2>VIDEO EDITOR & VIDEOGRAPHER</h2>
+            
+            <div class="quote">
+                "Merangkai momen jadi cerita. Menyusun gambar jadi makna."
+            </div>
 
-    <!-- KONTEN APLIKASI -->
-    <div class="container" id="appContent">
-        <div class="header-bar">
-            <div>
-                <h1 class="title-bengkel">BENGKEL LAS AJAIB</h1>
-                <div class="user-info">
-                    <span id="userName">User</span> 
-                    <button class="btn-logout" onclick="logoutManual()">Keluar</button>
+            <div class="contact-bar">
+                <a href="mailto:haidarpe185@gmail.com" class="contact-item">
+                    <i class="fas fa-envelope"></i> haidarpe185@gmail.com
+                </a>
+                <a href="https://wa.me/6285883930873" target="_blank" class="contact-item">
+                    <i class="fab fa-whatsapp"></i> 085883930873
+                </a>
+                <a href="https://www.instagram.com/haidar_185/" target="_blank" class="contact-item">
+                    <i class="fab fa-instagram"></i> @haidar_185
+                </a>
+                <div class="contact-item" style="cursor: default;">
+                    <i class="fas fa-map-marker-alt"></i> Pasuruan, Jawa Timur
                 </div>
             </div>
-            <div>
-                <span class="status-save" id="saveStatus">🔄 Menunggu Sinkronisasi...</span>
-            </div>
         </div>
+    </section>
 
-        <div class="toolbar">
-            <button class="btn-undo" onclick="undoAksi()">↩️ Undo</button>
-            <button class="btn-redo" onclick="redoAksi()">↪️ Redo</button>
-            <span style="flex-grow:1"></span>
-            
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-            <button class="btn-import" onclick="document.getElementById('importFile').click()">📥 Import Proyek</button>
-            <button class="btn-export" onclick="exportJSON()">📤 Export Proyek</button>
-        </div>
-
-        <div class="project-manager">
-            <div class="project-controls">
-                <label style="margin-bottom:0; font-size: 14px;">Proyek Aktif:</label>
-                <select id="projectSelector" onchange="gantiProyek()" style="font-weight: bold; background: #fff;"></select>
-                <button class="btn-proj-new" onclick="buatProyekBaru()">➕ Baru</button>
-                <button class="btn-proj-rename" onclick="ubahNamaProyek()">✏️ Rename</button>
-                <button class="btn-proj-del" onclick="hapusProyek()">🗑️ Hapus</button>
-            </div>
-        </div>
-        
-        <div>
-            <div style="margin-bottom: 15px;">
-                <label>Input Kategori Material:</label>
-                <select id="tipeMaterial" onchange="toggleForm()" style="max-width: 300px; font-weight:bold;">
-                    <option value="besi">Besi / Profil (Lonjoran)</option>
-                    <option value="plat">Lembaran / Plat (Triplek/Besi)</option>
-                    <option value="baut">Baut / Aksesoris (Pcs)</option>
-                </select>
-            </div>
-
-            <div class="form-group" id="inputForm">
-                <div><label>Jenis Material</label><input type="text" id="jenis" placeholder="Cth: Hollow 4x4"></div>
-                <div><label>Bagian</label><input type="text" id="bagian" placeholder="Cth: Kaki Meja"></div>
-                <div id="col-p"><label>Pjg (mm)</label><input type="number" id="p" value="0"></div>
-                <div id="col-l" style="display: none;"><label>Lbr (mm)</label><input type="number" id="l" value="0"></div>
-                <div><label>Qty</label><input type="number" id="qty" value="1"></div>
-                <div id="col-stdP"><label id="label-stdP">Std Pjg (mm)</label><input type="number" id="stdP" value="6000"></div>
-                <div id="col-stdL" style="display: none;"><label>Std Lbr (mm)</label><input type="number" id="stdL" value="1220"></div>
-                <button class="btn-tambah" onclick="tambahItem()">+ Tambah</button>
-            </div>
-        </div>
-
-        <!-- AREA PRINT -->
-        <div id="areaPrint">
-            
-            <!-- HEADER KHUSUS PRINT (Ditampilkan HANYA saat di-export) -->
-            <div id="headerPrint" style="display:none; text-align:center; color:black; margin-bottom:25px; border-bottom: 3px solid #2c3e50; padding-bottom: 15px;">
-                <h1 style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: 2px;">BENGKEL LAS AJAIB</h1>
-                <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold;">Rincian Kebutuhan Material</p>
-                <p style="margin: 5px 0 0 0; font-size: 16px;">Nama Proyek: <span id="namaProyekPrint" style="color: #c0392b; font-weight: bold;"></span></p>
-            </div>
-            
-            <h2><span>Rincian Kebutuhan</span> <button style="background:#e74c3c; color:white;" class="hide-on-print" onclick="bersihkanTabel()">🧹 Bersihkan Tabel</button></h2>
-            <div class="table-responsive">
-                <table id="tableRincian">
-                    <thead>
-                        <tr><th>Tipe</th><th>Jenis</th><th>Bagian</th><th>Pjg(mm)</th><th>Lbr(mm)</th><th>Qty</th><th>Std Pjg</th><th>Std Lbr</th><th class="hide-on-print">Aksi</th></tr>
-                    </thead>
-                    <tbody id="tabelRincianBody"></tbody>
-                </table>
-            </div>
-
-            <h2 style="margin-top: 30px;">
-                <span>Rekapitulasi Belanja</span> 
-                <div class="hide-on-print">
-                    <button class="btn-img" id="btnExportImg" onclick="exportGambar()">📸 Export Gambar</button>
-                    <button class="btn-pdf" id="btnExportPdf" onclick="exportPDF()">📄 Export PDF</button>
+    <!-- About & Skills Section -->
+    <section id="about" class="container">
+        <h2 class="section-title">Tentang Saya & Keahlian</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Saya adalah seorang kreatif asal Pasuruan yang siap berkarya, termasuk untuk kesempatan di Surabaya. Saya berminat pada dunia videografi, di mana saya senang mengekspresikan sesuatu melalui media video.</p>
+                <p>Dalam proses merangkai momen menjadi cerita, saya memadukan kemampuan editing visual, produksi live streaming, hingga pengoperasian drone dan eksplorasi animasi 3D untuk menghasilkan karya yang komunikatif dan mendalam.</p>
+                
+                <div class="tech-tags">
+                    <span class="tech-tag">Premiere Pro</span>
+                    <span class="tech-tag">DaVinci Resolve</span>
+                    <span class="tech-tag">After Effects</span>
+                    <span class="tech-tag">vMix</span>
+                    <span class="tech-tag">OBS</span>
+                    <span class="tech-tag">Blender (3D)</span>
+                    <span class="tech-tag">Drone Piloting</span>
                 </div>
-            </h2>
-            <div class="table-responsive">
-                <table id="tableRekap">
-                    <thead>
-                        <tr><th>Kategori</th><th>Jenis Material</th><th>Ukuran Standar</th><th>Total Kebutuhan</th><th>Butuh (Beli)</th><th>Sisa / Lebih</th></tr>
-                    </thead>
-                    <tbody id="tabelRekapBody"></tbody>
-                </table>
+            </div>
+
+            <div class="skills-wrapper">
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span>Video Editor</span>
+                        <span>94%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-bar" style="width: 94%;"></div>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span>Videographer</span>
+                        <span>87%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-bar" style="width: 87%;"></div>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <div class="skill-info">
+                        <span>3D Artist</span>
+                        <span>75%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-bar" style="width: 75%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience & Education -->
+    <section id="experience" style="background-color: var(--surface-color);">
+        <div class="container">
+            <h2 class="section-title">Pengalaman & Pendidikan</h2>
+            <div class="timeline-grid">
+                
+                <!-- Experience -->
+                <div class="timeline-column">
+                    <div class="timeline-card" style="margin-bottom: 20px;">
+                        <h3>Digital Marketing</h3>
+                        <h4>Taman Ria Suropati</h4>
+                        <span class="date-badge">2025 - Sekarang</span>
+                        <ul>
+                            <li>Memproduksi video promosi dan konten kreatif untuk kebutuhan publikasi Digital Marketing.</li>
+                            <li>Bertanggung jawab penuh sebagai spesialis Video Editor dan Videografer internal.</li>
+                            <li>Mengelola strategi penceritaan visual untuk meningkatkan engagement penonton.</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-card" style="margin-bottom: 20px;">
+                        <h3>Freelance Video Editor</h3>
+                        <span class="date-badge">2023 - Sekarang</span>
+                        <ul>
+                            <li>Menerima dan memahami brief dari klien terkait jenis video yang dibutuhkan.</li>
+                            <li>Menyusun footage menjadi alur cerita yang menarik serta komunikatif.</li>
+                            <li>Mengelola arsip dokumentasi untuk keperluan publikasi di media sosial.</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-card">
+                        <h3>Freelance Videografer</h3>
+                        <span class="date-badge">2023 - Sekarang</span>
+                        <ul>
+                            <li>Bergabung bersama rekan kerja untuk mengabadikan momen pernikahan, rapat organisasi, dan acara sekolah.</li>
+                            <li>Memproduksi video dokumentasi untuk promosi pariwisata.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Magang & Education -->
+                <div class="timeline-column">
+                    <div class="timeline-card" style="margin-bottom: 20px;">
+                        <h3>Tim Kreatif (Magang)</h3>
+                        <h4>Dinas Pariwisata Kota Pasuruan</h4>
+                        <span class="date-badge">Juli - Desember 2024</span>
+                        <ul>
+                            <li>Dokumentasi video acara resmi & promosi wisata.</li>
+                            <li>Editing video kegiatan dinas menggunakan Premiere Pro & DaVinci Resolve.</li>
+                            <li>Produksi konten promosi untuk platform media sosial.</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-card">
+                        <h3>Desain Komunikasi Visual</h3>
+                        <h4>SMK Negeri 1 Pasuruan</h4>
+                        <span class="date-badge">2022 - 2025</span>
+                        <ul>
+                            <li>Video pendek "Revitalisasi Kota Pasuruan" - Juara 1 Tingkat Kota.</li>
+                            <li>Terlibat dalam dokumentasi Hari Jadi Kota Pasuruan.</li>
+                            <li>Proyek UKK bertema "Pasuruan Dalam Dua Waktu".</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Projects Grid -->
+    <section id="portfolio" class="container">
+        <h2 class="section-title">Proyek Portofolio</h2>
+        
+                        <!-- KATEGORI: VIDEO PENDEK -->
+        <h3 class="category-title">Video Pendek</h3>
+        <div class="projects-grid">
+            <div class="project-card" onclick="openVideoModal('rchFVJnkm0Y', '2024-VIDEO COMPETITION-KOTA LAMA SURABAYA')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/rchFVJnkm0Y/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2024-VIDEO COMPETITION-KOTA LAMA SURABAYA</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('cZUakY7kyng', '2026-KEGIATAN MOTOTRIL')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/cZUakY7kyng/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2026-KEGIATAN MOTOTRIL</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('XFgKyNl7T80', '2025-LOMBA PROMOSI PERUMAHAN-PASURUAN GRAND CITY')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/XFgKyNl7T80/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2025-LOMBA PROMOSI PERUMAHAN-PASURUAN GRAND CITY</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('-N4Ia7-W1uM', '2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/-N4Ia7-W1uM/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('wka77D1-lpU', '2025-LOMBA HUT INDONESIA KE 80-TOURISM PASURUAN')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/wka77D1-lpU/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2025-LOMBA HUT INDONESIA KE 80-TOURISM PASURUAN</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('iqfRPxiwiHk', '2024-LOMBA HUT INDONESIA KE 79-TOURISM PASURUAN')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/iqfRPxiwiHk/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2024-LOMBA HUT INDONESIA KE 79-TOURISM PASURUAN</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('ysvCdYin3WU', '2025-TAMAN RIA SUROPATI-APA KATA MEREKA?')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/ysvCdYin3WU/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2025-TAMAN RIA SUROPATI-APA KATA MEREKA?</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORI: FILM PENDEK -->
+        <h3 class="category-title" style="margin-top: 80px;">Film Pendek</h3>
+        <div class="projects-grid">
+            <div class="project-card" onclick="openVideoModal('Sui12qEU4I8', '2025-FILM COMPETITON-LANGEN BANYU')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/Sui12qEU4I8/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Film Pendek</span>
+                    <h3>2025-FILM COMPETITON-LANGEN BANYU</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('CRa5FznJtKg', '2023-AMIKOM VIDEO COMPETITION-TRIASIH')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/CRa5FznJtKg/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Film Pendek</span>
+                    <h3>2023-AMIKOM VIDEO COMPETITION-TRIASIH</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('CRa5FznJtKg', '2024-AMIKOM VIDEO COMPETITION-ANTARA')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/CRa5FznJtKg/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Film Pendek</span>
+                    <h3>2024-AMIKOM VIDEO COMPETITION-ANTARA</h3>
+                </div>
+            </div>
+            <div class="project-card" onclick="openVideoModal('ZFBhkDm8E5g', '2023-NAFIFEST-A NGORMATI')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/ZFBhkDm8E5g/0.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Film Pendek</span>
+                    <h3>2023-NAFIFEST-A NGORMATI</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Awards Section -->
+    <section id="awards" class="container">
+        <h2 class="section-title">Penghargaan</h2>
+        <div class="awards-container">
+            <div class="award-item">
+                <h3><i class="fas fa-trophy" style="margin-right: 10px;"></i> Juara 1 Kategori TikTok - "Anden Lakon"</h3>
+                <p>Amikom Video Competition 2023 (Diselenggarakan oleh Universitas AMIKOM Yogyakarta & Cabdin Wilayah Pasuruan).</p>
+            </div>
+            
+            <div class="award-item">
+                <h3><i class="fas fa-award" style="margin-right: 10px;"></i> Juara 2 Kategori Cinematography - "Anden Lakon"</h3>
+                <p>Amikom Video Competition 2023.</p>
+            </div>
+
+            <div class="award-item">
+                <h3><i class="fas fa-medal" style="margin-right: 10px;"></i> Juara 2 Kategori Drama - "TRIASIH"</h3>
+                <p>Amikom Video Competition 2023.</p>
+            </div>
+            
+            <div class="award-item">
+                <h3><i class="fas fa-star" style="margin-right: 10px;"></i> Peserta Terkreatif</h3>
+                <p>Gerakan Kolaborasi Aksi Forum Anak Jawa Timur (GALAKSI FAJAR 3.0) 2023 - Forum Anak Jatim, PLATO Foundation, & UNICEF.</p>
+            </div>
+
+            <div class="award-item">
+                <h3><i class="fas fa-film" style="margin-right: 10px;"></i> Film Favorit - "A NGORMATI"</h3>
+                <p>Navi Film Festival (NAFIFEST) 2023 - UIN K.H Abdurrahman Wahid Pekalongan.</p>
+            </div>
+
+            <div class="award-item">
+                <h3><i class="fas fa-trophy" style="margin-right: 10px;"></i> Juara 1 Lomba Promosi Perumahan</h3>
+                <p>Video Pendek "PASURUAN GRAND CITY"</p>
+            </div>
+
+            <div class="award-item">
+                <h3><i class="fas fa-trophy" style="margin-right: 10px;"></i> Juara 1 Lomba HUT Indonesia Ke 79</h3>
+                <p>Video Pendek "TOURISM PASURUAN"</p>
+            </div>
+
+            <div class="award-item">
+                <h3><i class="fas fa-award" style="margin-right: 10px;"></i> Juara 2 Lomba HUT Indonesia Ke 80</h3>
+                <p>Video Pendek "TOURISM PASURUAN"</p>
+            </div>
+            
+            <div class="award-item">
+                <h3><i class="fas fa-medal" style="margin-right: 10px;"></i> Juara 3 Video Competition</h3>
+                <p>Kota Lama Surabaya</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Lightbox Window -->
+    <div id="videoModal" class="video-modal" onclick="closeVideoModalOnBg(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalVideoTitle">Judul Video</h3>
+                <button class="modal-close-btn" onclick="closeVideoModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-video-container">
+                <iframe id="modalIframe" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
         </div>
     </div>
+
+    <footer>
+        <p>&copy; 2026 Mochamad Ali Haidar. All rights reserved.</p>
+    </footer>
 
     <script>
-        // ==========================================
-        // CONFIG FIREBASE
-        // ==========================================
-        const firebaseConfig = {
-          apiKey: "AIzaSyC4zqHJlBGXwPCMXvkEGt2OzT9aghb7CAs",
-          authDomain: "bengkel-las-ajaib.firebaseapp.com",
-          projectId: "bengkel-las-ajaib",
-          storageBucket: "bengkel-las-ajaib.firebasestorage.app",
-          messagingSenderId: "115215576003",
-          appId: "1:115215576003:web:f3a91e8e83946dee9e2b76",
-          measurementId: "G-2JWXY1E2TL"
-        };
+        function openVideoModal(videoId, title) {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+            const titleElement = document.getElementById('modalVideoTitle');
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // Variabel Database Bersama
-        let projects = { "Proyek Utama": [] };
-        let currentProject = "Proyek Utama";
-        let dataMaterial = []; 
-
-        let historyStack = [];
-        let redoStack = [];
-
-        // ==========================================
-        // SETUP NAVIGASI KEYBOARD 
-        // ==========================================
-        function setupKeyboardNavigation() {
-            const inputForm = document.getElementById('inputForm');
-            inputForm.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const inputs = Array.from(inputForm.querySelectorAll('input')).filter(el => el.parentElement.style.display !== 'none');
-                    const currentIndex = inputs.indexOf(e.target);
-                    
-                    if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
-                        inputs[currentIndex + 1].focus();
-                    } else if (currentIndex === inputs.length - 1) {
-                        tambahItem();
-                    }
-                }
-            });
-
-            document.getElementById('tableRincian').addEventListener('keydown', function(e) {
-                if (!e.target.hasAttribute('contenteditable')) return;
-                
-                const cell = e.target;
-                const row = cell.parentElement;
-                const cellIndex = Array.from(row.children).indexOf(cell);
-                let nextCell = null;
-                
-                if (e.key === 'Enter') {
-                    e.preventDefault(); 
-                    nextCell = cell.nextElementSibling;
-                    while(nextCell && !nextCell.hasAttribute('contenteditable')) {
-                        nextCell = nextCell.nextElementSibling;
-                    }
-                    if(!nextCell && row.nextElementSibling) {
-                        nextCell = row.nextElementSibling.querySelector('[contenteditable="true"]');
-                    }
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    const prevRow = row.previousElementSibling;
-                    if (prevRow) nextCell = prevRow.children[cellIndex];
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    const nextRow = row.nextElementSibling;
-                    if (nextRow) nextCell = nextRow.children[cellIndex];
-                }
-                
-                if (nextCell && nextCell.hasAttribute('contenteditable')) {
-                    nextCell.focus();
-                    let range = document.createRange();
-                    range.selectNodeContents(nextCell);
-                    range.collapse(false); 
-                    let sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }
-            });
-        }
-
-        // ==========================================
-        // SISTEM UNDO & REDO
-        // ==========================================
-        function simpanStatusUndo() {
-            historyStack.push({ projectsData: JSON.parse(JSON.stringify(projects)), activeProject: currentProject });
-            if(historyStack.length > 20) historyStack.shift(); 
-            redoStack = []; 
-        }
-
-        function undoAksi() {
-            if(historyStack.length === 0) return alert("Tidak ada data untuk di-undo!");
-            redoStack.push({ projectsData: JSON.parse(JSON.stringify(projects)), activeProject: currentProject });
-            let statusSblm = historyStack.pop();
-            projects = statusSblm.projectsData;
-            currentProject = statusSblm.activeProject;
+            titleElement.innerText = title;
+            // Set YouTube Embed URL
+            iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
             
-            const selector = document.getElementById('projectSelector');
-            selector.value = currentProject;
-            dataMaterial = projects[currentProject] || [];
-            simpanKeCloud(); 
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Perbaikan scroll khusus iPhone/Safari Mobile
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
         }
 
-        function redoAksi() {
-            if(redoStack.length === 0) return alert("Tidak ada data untuk di-redo!");
-            historyStack.push({ projectsData: JSON.parse(JSON.stringify(projects)), activeProject: currentProject });
-            let statusMaju = redoStack.pop();
-            projects = statusMaju.projectsData;
-            currentProject = statusMaju.activeProject;
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('modalIframe');
+
+            modal.classList.remove('active');
+            iframe.src = ''; 
             
-            const selector = document.getElementById('projectSelector');
-            selector.value = currentProject;
-            dataMaterial = projects[currentProject] || [];
-            simpanKeCloud();
+            document.body.style.overflow = 'auto';
+            document.body.style.position = '';
+            document.body.style.width = '';
         }
 
-        // ==========================================
-        // SISTEM IMPORT & EXPORT JSON
-        // ==========================================
-        function exportJSON() {
-            const projectData = {
-                projectName: currentProject,
-                items: projects[currentProject] || []
-            };
-            
-            const jsonText = JSON.stringify(projectData, null, 2);
-            const blob = new Blob([jsonText], { type: "application/json" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            
-            const safeName = currentProject.replace(/[^a-zA-Z0-9]/g, '_');
-            link.download = `Proyek_${safeName}.json`;
-            link.click();
-        }
-
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const dataMasuk = JSON.parse(e.target.result);
-                    
-                    if (!dataMasuk.projectName || !Array.isArray(dataMasuk.items)) {
-                        alert("Format file tidak valid! Pastikan ini adalah file hasil Export Proyek.");
-                        return;
-                    }
-
-                    simpanStatusUndo();
-                    
-                    let namaBaru = dataMasuk.projectName;
-                    let counter = 1;
-                    
-                    while (projects[namaBaru]) {
-                        namaBaru = `${dataMasuk.projectName} (${counter})`;
-                        counter++;
-                    }
-
-                    projects[namaBaru] = dataMasuk.items;
-                    currentProject = namaBaru;
-                    dataMaterial = projects[currentProject];
-                    
-                    updateProjectDropdown();
-                    simpanKeCloud();
-                    
-                    alert(`Proyek berhasil di-import sebagai: ${namaBaru}`);
-                } catch (err) { 
-                    alert("File tidak valid atau rusak!"); 
-                }
-                
-                document.getElementById('importFile').value = '';
-            };
-            reader.readAsText(file);
-        }
-
-        // ==========================================
-        // SISTEM EXPORT PDF & GAMBAR (Dengan Header & Anti Kedip)
-        // ==========================================
-        async function exportGambar() {
-            const btn = document.getElementById('btnExportImg');
-            const teksAsli = btn.innerText;
-            btn.innerText = "⏳ Memproses...";
-
-            try {
-                window.scrollTo(0, 0); 
-                
-                // HINDARI mengubah layar asli agar tidak berkedip.
-                // Buka overflow layar asli hanya untuk memastikan html2canvas membaca ukurannya.
-                const tables = document.querySelectorAll('.table-responsive');
-                tables.forEach(t => t.style.overflow = 'visible');
-
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                const area = document.getElementById('areaPrint');
-                
-                const canvas = await html2canvas(area, {
-                    scale: 2,
-                    backgroundColor: "#ffffff",
-                    useCORS: true,
-                    allowTaint: true,
-                    // onclone memungkinkan kita mengedit tampilan hasil ekspor TANPA mengganggu layar asli
-                    onclone: function(clonedDoc) {
-                        const areaClone = clonedDoc.getElementById('areaPrint');
-                        
-                        // Sembunyikan semua tombol di hasil foto
-                        const sembunyi = areaClone.querySelectorAll('.hide-on-print');
-                        sembunyi.forEach(el => el.style.display = 'none');
-                        
-                        // Tampilkan Kop Surat "BENGKEL LAS AJAIB" di hasil foto
-                        const headerPrint = areaClone.querySelector('#headerPrint');
-                        if(headerPrint) headerPrint.style.display = 'block';
-                        
-                        // Isi nama proyeknya
-                        const namaProyek = areaClone.querySelector('#namaProyekPrint');
-                        if(namaProyek) namaProyek.innerText = currentProject;
-
-                        // Pastikan tabel rapi dan tidak scroll
-                        const responsiveDivs = areaClone.querySelectorAll('.table-responsive');
-                        responsiveDivs.forEach(div => {
-                            div.style.overflow = 'visible';
-                            div.style.width = '100%';
-                        });
-                        
-                        // Buat background kotak menjadi rapi
-                        areaClone.style.padding = '30px';
-                        areaClone.style.borderRadius = '0';
-                        areaClone.style.boxShadow = 'none';
-                    }
-                });
-
-                const link = document.createElement('a');
-                link.download = `Material_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            } catch (err) {
-                console.error(err);
-                alert("Terjadi kesalahan saat memproses gambar: " + err.message);
-            } finally {
-                // Kembalikan overflow ke auto
-                document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
-                btn.innerText = teksAsli;
+        function closeVideoModalOnBg(e) {
+            if (e.target.id === 'videoModal') {
+                closeVideoModal();
             }
         }
 
-        async function exportPDF() {
-            const btn = document.getElementById('btnExportPdf');
-            const teksAsli = btn.innerText;
-            btn.innerText = "⏳ Memproses...";
-
-            try {
-                window.scrollTo(0, 0);
-
-                const tables = document.querySelectorAll('.table-responsive');
-                tables.forEach(t => t.style.overflow = 'visible');
-
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                const area = document.getElementById('areaPrint');
-                
-                const canvas = await html2canvas(area, {
-                    scale: 2,
-                    backgroundColor: "#ffffff",
-                    useCORS: true,
-                    allowTaint: true,
-                    onclone: function(clonedDoc) {
-                        const areaClone = clonedDoc.getElementById('areaPrint');
-                        
-                        const sembunyi = areaClone.querySelectorAll('.hide-on-print');
-                        sembunyi.forEach(el => el.style.display = 'none');
-                        
-                        const headerPrint = areaClone.querySelector('#headerPrint');
-                        if(headerPrint) headerPrint.style.display = 'block';
-                        
-                        const namaProyek = areaClone.querySelector('#namaProyekPrint');
-                        if(namaProyek) namaProyek.innerText = currentProject;
-
-                        const responsiveDivs = areaClone.querySelectorAll('.table-responsive');
-                        responsiveDivs.forEach(div => {
-                            div.style.overflow = 'visible';
-                            div.style.width = '100%';
-                        });
-                        
-                        areaClone.style.padding = '30px';
-                        areaClone.style.borderRadius = '0';
-                        areaClone.style.boxShadow = 'none';
-                    }
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const jsPDF = window.jspdf.jsPDF;
-                
-                // Set PDF margin & orientasi
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`Material_${currentProject.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
-            } catch (err) {
-                console.error(err);
-                alert("Terjadi kesalahan saat memproses PDF: " + err.message);
-            } finally {
-                document.querySelectorAll('.table-responsive').forEach(t => t.style.overflow = 'auto');
-                btn.innerText = teksAsli;
-            }
-        }
-
-        // ==========================================
-        // LOGIN & SINKRONISASI PINTAR
-        // ==========================================
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                document.getElementById('userName').innerText = user.email;
-                mulaiRealtimeSync(); 
-            } else {
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('appContent').style.display = 'none';
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeVideoModal();
             }
         });
-
-        function loginManual() {
-            const email = document.getElementById('emailInput').value.trim();
-            const password = document.getElementById('passwordInput').value.trim();
-            const errorDiv = document.getElementById('loginError');
-
-            if(!email || !password) {
-                errorDiv.innerText = "Email dan password tidak boleh kosong!";
-                errorDiv.style.color = "#ff7675";
-                return;
-            }
-            errorDiv.innerText = "⏳ Sedang memeriksa...";
-            errorDiv.style.color = "#3498db";
-
-            firebase.auth().signInWithEmailAndPassword(email, password).catch(() => {
-                errorDiv.style.color = "#ff7675"; errorDiv.innerText = "⚠️ Login Gagal! Pastikan Email dan Password benar.";
-            });
-        }
-
-        function logoutManual() { auth.signOut(); }
-
-        function mulaiRealtimeSync() {
-            db.collection("bengkel").doc("data_kalkulator").onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.projects) {
-                        if (JSON.stringify(projects) === JSON.stringify(data.projects)) return;
-                        
-                        const isCurrentProjectChanged = JSON.stringify(projects[currentProject]) !== JSON.stringify(data.projects[currentProject]);
-                        projects = data.projects;
-                        
-                        if (!projects[currentProject]) {
-                            currentProject = Object.keys(projects)[0] || "Proyek Utama";
-                            updateProjectDropdown();
-                            dataMaterial = projects[currentProject] || [];
-                            renderTabel();
-                        } else {
-                            updateProjectDropdown();
-                            dataMaterial = projects[currentProject];
-                            if (isCurrentProjectChanged) {
-                                renderTabel();
-                            }
-                        }
-                    }
-                } else {
-                    projects = { "Proyek Utama": [] };
-                    currentProject = "Proyek Utama";
-                    simpanKeCloud();
-                }
-                
-                const status = document.getElementById('saveStatus');
-                status.innerText = "🟢 Real-time aktif"; 
-                status.style.color = "#27ae60";
-            });
-        }
-
-        // ==========================================
-        // MANAJEMEN DATA & UI
-        // ==========================================
-        function simpanKeCloud() {
-            projects[currentProject] = dataMaterial; 
-            const status = document.getElementById('saveStatus');
-            status.innerText = "⏳ Menyimpan..."; status.style.color = "#d35400";
-            
-            db.collection("bengkel").doc("data_kalkulator").set({
-                projects: projects,
-                terakhirDiupdate: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { status.innerText = "🟢 Real-time aktif"; status.style.color = "#27ae60"; });
-        }
-
-        function updateProjectDropdown() {
-            const selector = document.getElementById('projectSelector');
-            selector.innerHTML = '';
-            for (let proj in projects) {
-                let opt = document.createElement('option');
-                opt.value = proj; opt.innerText = proj;
-                selector.appendChild(opt);
-            }
-            selector.value = currentProject;
-        }
-
-        function gantiProyek() {
-            currentProject = document.getElementById('projectSelector').value;
-            dataMaterial = projects[currentProject] || [];
-            renderTabel(); 
-        }
-
-        function buatProyekBaru() {
-            let nama = prompt("Masukkan nama proyek baru:");
-            if (nama && nama.trim() !== "") {
-                if (projects[nama]) return alert("Nama proyek sudah ada!");
-                simpanStatusUndo();
-                projects[currentProject] = dataMaterial; 
-                projects[nama] = []; 
-                currentProject = nama; 
-                dataMaterial = projects[currentProject];
-                updateProjectDropdown();
-                simpanKeCloud();
-            }
-        }
-
-        function ubahNamaProyek() {
-            let namaBaru = prompt("Ubah nama proyek:", currentProject);
-            if (namaBaru && namaBaru.trim() !== "" && namaBaru !== currentProject) {
-                if (projects[namaBaru]) return alert("Nama tersebut sudah dipakai!");
-                simpanStatusUndo();
-                projects[currentProject] = dataMaterial; 
-                projects[namaBaru] = projects[currentProject];
-                delete projects[currentProject]; 
-                currentProject = namaBaru;
-                dataMaterial = projects[currentProject];
-                updateProjectDropdown();
-                simpanKeCloud();
-            }
-        }
-
-        function hapusProyek() {
-            if (Object.keys(projects).length <= 1) return alert("Minimal harus ada 1 proyek.");
-            if (confirm(`Yakin ingin menghapus seluruh data pada "${currentProject}"?`)) {
-                simpanStatusUndo();
-                delete projects[currentProject];
-                currentProject = Object.keys(projects)[0];
-                dataMaterial = projects[currentProject] || []; 
-                updateProjectDropdown();
-                simpanKeCloud();
-            }
-        }
-
-        function bersihkanTabel() {
-            if (confirm("Hapus semua rincian di tabel ini?")) {
-                simpanStatusUndo();
-                dataMaterial = [];
-                simpanKeCloud();
-            }
-        }
-
-        function toggleForm() {
-            const tipe = document.getElementById('tipeMaterial').value;
-            document.getElementById('col-p').style.display = tipe !== 'baut' ? 'block' : 'none';
-            document.getElementById('col-l').style.display = tipe === 'plat' ? 'block' : 'none';
-            document.getElementById('col-stdP').style.display = tipe !== 'baut' ? 'block' : 'none';
-            document.getElementById('col-stdL').style.display = tipe === 'plat' ? 'block' : 'none';
-            if(tipe === 'besi') { document.getElementById('label-stdP').innerText = 'Std Pjg (mm)'; document.getElementById('stdP').value = 6000; }
-            if(tipe === 'plat') { document.getElementById('label-stdP').innerText = 'Std Pjg (mm)'; document.getElementById('stdP').value = 2440; document.getElementById('stdL').value = 1220; }
-        }
-
-        function tambahItem() {
-            const tipe = document.getElementById('tipeMaterial').value;
-            const jenis = document.getElementById('jenis').value.trim();
-            const bagian = document.getElementById('bagian').value.trim();
-            const qty = parseInt(document.getElementById('qty').value) || 0;
-            const p = tipe !== 'baut' ? parseFloat(document.getElementById('p').value) || 0 : 0;
-            const l = tipe === 'plat' ? parseFloat(document.getElementById('l').value) || 0 : 0;
-            const stdP = tipe !== 'baut' ? parseFloat(document.getElementById('stdP').value) || 0 : 0;
-            const stdL = tipe === 'plat' ? parseFloat(document.getElementById('stdL').value) || 0 : 0;
-
-            if (!jenis || qty <= 0) return alert("Jenis dan Qty wajib diisi!");
-            
-            simpanStatusUndo();
-            dataMaterial.push({ id: Date.now(), tipe, jenis, bagian, p, l, qty, stdP, stdL });
-            
-            document.getElementById('bagian').value = ''; 
-            document.getElementById('qty').value = '1'; 
-            document.getElementById('jenis').focus(); 
-            
-            simpanKeCloud(); 
-        }
-
-        function hapusItem(id) { 
-            simpanStatusUndo();
-            dataMaterial = dataMaterial.filter(item => item.id !== id); 
-            simpanKeCloud(); 
-        }
-        
-        function updateData(id, field, value) {
-            let item = dataMaterial.find(x => x.id === id);
-            if(item) {
-                let parsedVal = ['p','l','qty','stdP','stdL'].includes(field) ? (parseFloat(value) || 0) : value.trim();
-                if (item[field] !== parsedVal) { 
-                    simpanStatusUndo();
-                    item[field] = parsedVal; 
-                    simpanKeCloud(); 
-                }
-            }
-        }
-
-        function renderTabel() {
-            const tbodyRincian = document.getElementById('tabelRincianBody');
-            const tbodyRekap = document.getElementById('tabelRekapBody');
-            tbodyRincian.innerHTML = ''; tbodyRekap.innerHTML = '';
-            let rekapMap = {};
-
-            dataMaterial.forEach(item => {
-                const isBesi = item.tipe === 'besi', isPlat = item.tipe === 'plat', isBaut = item.tipe === 'baut';
-                tbodyRincian.innerHTML += `
-                    <tr>
-                        <td>${item.tipe.toUpperCase()}</td>
-                        <td contenteditable="true" onblur="updateData(${item.id}, 'jenis', this.innerText)">${item.jenis}</td>
-                        <td contenteditable="true" onblur="updateData(${item.id}, 'bagian', this.innerText)">${item.bagian}</td>
-                        <td ${!isBaut ? 'contenteditable="true"' : ''} onblur="updateData(${item.id}, 'p', this.innerText)">${!isBaut ? item.p : '-'}</td>
-                        <td ${isPlat ? 'contenteditable="true"' : ''} onblur="updateData(${item.id}, 'l', this.innerText)">${isPlat ? item.l : '-'}</td>
-                        <td contenteditable="true" onblur="updateData(${item.id}, 'qty', this.innerText)">${item.qty}</td>
-                        <td ${!isBaut ? 'contenteditable="true"' : ''} onblur="updateData(${item.id}, 'stdP', this.innerText)">${!isBaut ? item.stdP : '-'}</td>
-                        <td ${isPlat ? 'contenteditable="true"' : ''} onblur="updateData(${item.id}, 'stdL', this.innerText)">${isPlat ? item.stdL : '-'}</td>
-                        <td class="hide-on-print"><button class="delete-btn" onclick="hapusItem(${item.id})">Hapus</button></td>
-                    </tr>
-                `;
-
-                let key = `${item.tipe}-${item.jenis}`;
-                if (!rekapMap[key]) rekapMap[key] = { tipe: item.tipe, jenis: item.jenis, totalKebutuhan: 0, stdP: item.stdP, stdL: item.stdL };
-                if (isBesi) rekapMap[key].totalKebutuhan += (item.p * item.qty);
-                else if (isPlat) rekapMap[key].totalKebutuhan += (item.p * item.l * item.qty);
-                else if (isBaut) rekapMap[key].totalKebutuhan += item.qty;
-            });
-
-            for (const key in rekapMap) {
-                const data = rekapMap[key];
-                let teksKebutuhan = '', teksBeli = '', teksSisa = '', teksStandar = '';
-                if (data.tipe === 'besi') {
-                    let butuhLonjor = Math.ceil(data.totalKebutuhan / data.stdP);
-                    teksStandar = `${data.stdP} mm`; teksKebutuhan = `${data.totalKebutuhan} mm`; 
-                    teksBeli = `${butuhLonjor} Ljr`; teksSisa = ((butuhLonjor * data.stdP) - data.totalKebutuhan > 0) ? `${(butuhLonjor * data.stdP) - data.totalKebutuhan} mm` : '0';
-                } else if (data.tipe === 'plat') {
-                    let luasLembar = data.stdP * data.stdL; let butuhLembar = Math.ceil(data.totalKebutuhan / luasLembar);
-                    let sisaLuas = (butuhLembar * luasLembar) - data.totalKebutuhan;
-                    teksStandar = `${data.stdP}x${data.stdL}`; teksKebutuhan = `${(data.totalKebutuhan / 1000000).toFixed(2)} m²`; 
-                    teksBeli = `${butuhLembar} Lbr`; teksSisa = sisaLuas > 0 ? `${(sisaLuas / 1000000).toFixed(2)} m²` : '0';
-                } else if (data.tipe === 'baut') {
-                    teksStandar = '-'; teksKebutuhan = `${data.totalKebutuhan} Pcs`; teksBeli = `${data.totalKebutuhan} Pcs`; teksSisa = '-';
-                }
-                tbodyRekap.innerHTML += `<tr><td><strong>${data.tipe.toUpperCase()}</strong></td><td>${data.jenis}</td><td>${teksStandar}</td><td>${teksKebutuhan}</td><td style="color:#27ae60; font-weight:bold;">${teksBeli}</td><td>${teksSisa}</td></tr>`;
-            }
-        }
-        
-        window.onload = function() { 
-            toggleForm(); 
-            setupKeyboardNavigation();
-        };
     </script>
+
 </body>
 </html>
