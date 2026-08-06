@@ -21,7 +21,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth; /* Smooth scroll untuk Back to Top */
+            scroll-behavior: smooth;
         }
 
         body {
@@ -436,7 +436,7 @@
             position: relative;
             width: 100%;
             max-width: 1200px;
-            height: 90vh; /* Tinggi dinamis */
+            height: 90vh;
             background: #0f172a;
             border-radius: 16px;
             overflow: hidden;
@@ -542,7 +542,8 @@
 
         /* Back to Top Button */
         #backToTopBtn {
-            display: none; 
+            visibility: hidden;
+            opacity: 0; 
             position: fixed; 
             bottom: 30px; 
             right: 30px; 
@@ -557,10 +558,16 @@
             height: 50px;
             border-radius: 50%;
             box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
-            transition: all 0.3s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.3s ease;
         }
 
-        #backToTopBtn:hover {
+        #backToTopBtn.show {
+            visibility: visible;
+            opacity: 0.5; /* Agak redup agar tidak mengganggu fokus visual */
+        }
+
+        #backToTopBtn.show:hover {
+            opacity: 1; /* Menyala pekat saat di-hover */
             background-color: #be123c;
             transform: translateY(-5px);
             box-shadow: 0 6px 20px rgba(225, 29, 72, 0.6);
@@ -796,20 +803,6 @@
         <h3 class="category-title">Video Pendek</h3>
         <div class="projects-grid">
             
-            <div class="project-card" onclick="openVideoModal('lChZ86fDel0', '2026-KEGIATAN MOTOTRIL')">
-                <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/lChZ86fDel0/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
-                    <div class="play-trigger-overlay">
-                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
-                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <span class="project-tag">Video Pendek</span>
-                    <h3>2026-KEGIATAN MOTOTRIL</h3>
-                </div>
-            </div>
-
             <div class="project-card" onclick="openVideoModal('JynhUiy4Tmg', '2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN')">
                 <div class="video-preview-wrapper">
                     <img src="https://img.youtube.com/vi/JynhUiy4Tmg/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
@@ -821,6 +814,20 @@
                 <div class="project-content">
                     <span class="project-tag">Video Pendek</span>
                     <h3>2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN</h3>
+                </div>
+            </div>
+
+            <div class="project-card" onclick="openVideoModal('lChZ86fDel0', '2026-KEGIATAN MOTOTRIL')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/lChZ86fDel0/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2026-KEGIATAN MOTOTRIL</h3>
                 </div>
             </div>
 
@@ -1080,18 +1087,39 @@
             }
         });
 
-        // Script untuk Tombol Back to Top
+        // Script untuk Tombol Back to Top dengan fitur Auto-Hide
         let mybutton = document.getElementById("backToTopBtn");
+        let scrollTimeout;
 
-        window.onscroll = function() {scrollFunction()};
-
-        function scrollFunction() {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                mybutton.style.display = "block";
+        window.onscroll = function() {
+            // Tampilkan tombol jika scroll > 400px
+            if (document.body.scrollTop > 400 || document.documentElement.scrollTop > 400) {
+                mybutton.classList.add("show");
+                
+                // Hapus hitungan mundur sebelumnya
+                clearTimeout(scrollTimeout);
+                
+                // Buat hitungan mundur baru: Sembunyikan tombol setelah 2 detik tidak ada scroll
+                scrollTimeout = setTimeout(function() {
+                    mybutton.classList.remove("show");
+                }, 2000);
             } else {
-                mybutton.style.display = "none";
+                mybutton.classList.remove("show");
             }
-        }
+        };
+
+        // Cegah tombol menghilang jika kursor sedang berada di atas tombol
+        mybutton.addEventListener("mouseenter", function() {
+            clearTimeout(scrollTimeout);
+            mybutton.classList.add("show");
+        });
+
+        // Mulai kembali hitungan mundur saat kursor meninggalkan tombol
+        mybutton.addEventListener("mouseleave", function() {
+            scrollTimeout = setTimeout(function() {
+                mybutton.classList.remove("show");
+            }, 2000);
+        });
 
         function scrollToTop() {
             window.scrollTo({top: 0, behavior: 'smooth'});
