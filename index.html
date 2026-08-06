@@ -296,16 +296,6 @@
             overflow: hidden;
         }
 
-        .video-preview-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-            pointer-events: none;
-        }
-
         .play-trigger-overlay {
             position: absolute;
             top: 0;
@@ -405,7 +395,7 @@
             position: relative;
             width: 100%;
             max-width: 1200px;
-            height: 90vh; /* Tinggi dinamis menyesuaikan isi */
+            height: 90vh; /* Tinggi dinamis */
             background: #0f172a;
             border-radius: 16px;
             overflow: hidden;
@@ -417,7 +407,7 @@
         }
 
         @keyframes modalZoom {
-            from { transform: scale(0.85); opacity: 0; }
+            from { transform: scale(0.95); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
@@ -425,17 +415,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 24px;
+            padding: 12px 20px;
             background: #1e293b;
             border-bottom: 1px solid #334155;
             flex-shrink: 0;
         }
 
         .modal-header h3 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             color: #f8fafc;
-            max-width: 90%;
+            max-width: 85%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -443,11 +433,11 @@
         }
 
         .modal-close-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(225, 29, 72, 0.1);
             border: none;
-            color: #f8fafc;
-            width: 36px;
-            height: 36px;
+            color: #fb7185;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             font-size: 1.2rem;
             cursor: pointer;
@@ -468,6 +458,7 @@
             height: 100%;
             flex-grow: 1;
             background: #000;
+            display: flex; 
         }
 
         .modal-video-container iframe {
@@ -720,8 +711,10 @@
         <!-- KATEGORI: VIDEO PENDEK -->
         <h3 class="category-title">Video Pendek</h3>
         <div class="projects-grid">
-            <div class="project-card" onclick="openVideoModal('JynhUiy4Tmg', '2024-VIDEO COMPETITION-KOTA LAMA SURABAYA')">
+            
+            <div class="project-card" onclick="openVideoModal('JynhUiy4Tmg', '2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN')">
                 <div class="video-preview-wrapper">
+                    <!-- Thumbnail dijamin tampil (posisi absolute, auto-fetch dari Youtube) -->
                     <img src="https://img.youtube.com/vi/JynhUiy4Tmg/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
                     <div class="play-trigger-overlay">
                         <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
@@ -730,9 +723,10 @@
                 </div>
                 <div class="project-content">
                     <span class="project-tag">Video Pendek</span>
-                    <h3>2024-VIDEO COMPETITION-KOTA LAMA SURABAYA</h3>
+                    <h3>2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN</h3>
                 </div>
             </div>
+
             <div class="project-card" onclick="openVideoModal('lChZ86fDel0', '2026-KEGIATAN MOTOTRIL')">
                 <div class="video-preview-wrapper">
                     <img src="https://img.youtube.com/vi/lChZ86fDel0/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
@@ -746,35 +740,10 @@
                     <h3>2026-KEGIATAN MOTOTRIL</h3>
                 </div>
             </div>
-            <div class="project-card" onclick="openVideoModal('wka77D1-lpU', '2025-LOMBA PROMOSI PERUMAHAN-PASURUAN GRAND CITY')">
+
+            <div class="project-card" onclick="openVideoModal('wka77D1-lpU', '2025-LOMBA HUT INDONESIA KE 80-TOURISM PASURUAN')">
                 <div class="video-preview-wrapper">
                     <img src="https://img.youtube.com/vi/wka77D1-lpU/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
-                    <div class="play-trigger-overlay">
-                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
-                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <span class="project-tag">Video Pendek</span>
-                    <h3>2025-LOMBA PROMOSI PERUMAHAN-PASURUAN GRAND CITY</h3>
-                </div>
-            </div>
-            <div class="project-card" onclick="openVideoModal('ZFBhkDm8E5g', '2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN')">
-                <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/ZFBhkDm8E5g/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
-                    <div class="play-trigger-overlay">
-                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
-                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <span class="project-tag">Video Pendek</span>
-                    <h3>2025-UJIAN KOMPETENSI KEAHLIAN SMKN 1 KOTA PASURUAN-TOURISM PASURUAN</h3>
-                </div>
-            </div>
-            <div class="project-card" onclick="openVideoModal('CRa5FznJtKg', '2025-LOMBA HUT INDONESIA KE 80-TOURISM PASURUAN')">
-                <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/CRa5FznJtKg/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
                     <div class="play-trigger-overlay">
                         <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
                         <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
@@ -785,22 +754,10 @@
                     <h3>2025-LOMBA HUT INDONESIA KE 80-TOURISM PASURUAN</h3>
                 </div>
             </div>
-            <div class="project-card" onclick="openVideoModal('Sui12qEU4I8', '2024-LOMBA HUT INDONESIA KE 79-TOURISM PASURUAN')">
+
+            <div class="project-card" onclick="openVideoModal('ZFBhkDm8E5g', '2025-TAMAN RIA SUROPATI-APA KATA MEREKA?')">
                 <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/Sui12qEU4I8/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
-                    <div class="play-trigger-overlay">
-                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
-                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <span class="project-tag">Video Pendek</span>
-                    <h3>2024-LOMBA HUT INDONESIA KE 79-TOURISM PASURUAN</h3>
-                </div>
-            </div>
-            <div class="project-card" onclick="openVideoModal('ysvCdYin3WU', '2025-TAMAN RIA SUROPATI-APA KATA MEREKA?')">
-                <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/ysvCdYin3WU/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <img src="https://img.youtube.com/vi/ZFBhkDm8E5g/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
                     <div class="play-trigger-overlay">
                         <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
                         <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
@@ -811,11 +768,55 @@
                     <h3>2025-TAMAN RIA SUROPATI-APA KATA MEREKA?</h3>
                 </div>
             </div>
+
+            <div class="project-card" onclick="openVideoModal('CRa5FznJtKg', '2025-LOMBA PROMOSI PERUMAHAN-PASURUAN GRAND CITY')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/CRa5FznJtKg/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2025-LOMBA PROMOSI PERUMAHAN-PASURUAN GRAND CITY</h3>
+                </div>
+            </div>
+
+            <div class="project-card" onclick="openVideoModal('Sui12qEU4I8', '2024-VIDEO COMPETITION-KOTA LAMA SURABAYA')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/Sui12qEU4I8/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2024-VIDEO COMPETITION-KOTA LAMA SURABAYA</h3>
+                </div>
+            </div>
+
+            <div class="project-card" onclick="openVideoModal('ysvCdYin3WU', '2024-LOMBA HUT INDONESIA KE 79-TOURISM PASURUAN')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/ysvCdYin3WU/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Video Pendek</span>
+                    <h3>2024-LOMBA HUT INDONESIA KE 79-TOURISM PASURUAN</h3>
+                </div>
+            </div>
+
         </div>
 
         <!-- KATEGORI: FILM PENDEK -->
         <h3 class="category-title" style="margin-top: 80px;">Film Pendek</h3>
         <div class="projects-grid">
+            
             <div class="project-card" onclick="openVideoModal('-N4Ia7-W1uM', '2025-FILM COMPETITON-LANGEN BANYU')">
                 <div class="video-preview-wrapper">
                     <img src="https://img.youtube.com/vi/-N4Ia7-W1uM/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
@@ -829,22 +830,10 @@
                     <h3>2025-FILM COMPETITON-LANGEN BANYU</h3>
                 </div>
             </div>
-            <div class="project-card" onclick="openVideoModal('XFgKyNl7T80', '2023-AMIKOM VIDEO COMPETITION-TRIASIH')">
+
+            <div class="project-card" onclick="openVideoModal('XFgKyNl7T80', '2024-AMIKOM VIDEO COMPETITION-ANTARA')">
                 <div class="video-preview-wrapper">
                     <img src="https://img.youtube.com/vi/XFgKyNl7T80/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
-                    <div class="play-trigger-overlay">
-                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
-                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
-                    </div>
-                </div>
-                <div class="project-content">
-                    <span class="project-tag">Film Pendek</span>
-                    <h3>2023-AMIKOM VIDEO COMPETITION-TRIASIH</h3>
-                </div>
-            </div>
-            <div class="project-card" onclick="openVideoModal('cZUakY7kyng', '2024-AMIKOM VIDEO COMPETITION-ANTARA')">
-                <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/cZUakY7kyng/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
                     <div class="play-trigger-overlay">
                         <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
                         <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
@@ -855,9 +844,10 @@
                     <h3>2024-AMIKOM VIDEO COMPETITION-ANTARA</h3>
                 </div>
             </div>
-            <div class="project-card" onclick="openVideoModal('rchFVJnkm0Y', '2023-NAFIFEST-A NGORMATI')">
+
+            <div class="project-card" onclick="openVideoModal('cZUakY7kyng', '2023-NAFIFEST-A NGORMATI')">
                 <div class="video-preview-wrapper">
-                    <img src="https://img.youtube.com/vi/rchFVJnkm0Y/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <img src="https://img.youtube.com/vi/cZUakY7kyng/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
                     <div class="play-trigger-overlay">
                         <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
                         <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
@@ -868,6 +858,21 @@
                     <h3>2023-NAFIFEST-A NGORMATI</h3>
                 </div>
             </div>
+
+            <div class="project-card" onclick="openVideoModal('rchFVJnkm0Y', '2023-AMIKOM VIDEO COMPETITION-TRIASIH')">
+                <div class="video-preview-wrapper">
+                    <img src="https://img.youtube.com/vi/rchFVJnkm0Y/hqdefault.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" alt="Thumbnail">
+                    <div class="play-trigger-overlay">
+                        <div class="play-button-icon"><i class="fas fa-play" style="margin-left: 4px;"></i></div>
+                        <span class="play-text"><i class="fas fa-expand" style="margin-right: 5px;"></i> Putar Layar Besar</span>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <span class="project-tag">Film Pendek</span>
+                    <h3>2023-AMIKOM VIDEO COMPETITION-TRIASIH</h3>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -930,7 +935,7 @@
                 <button class="modal-close-btn" onclick="closeVideoModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-video-container">
-                <iframe id="modalIframe" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe id="modalIframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; border: none;"></iframe>
             </div>
         </div>
     </div>
@@ -952,7 +957,7 @@
             iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
             
             // Simpan posisi scroll saat ini
-            scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+            scrollPosition = window.scrollY || document.documentElement.scrollTop;
             
             modal.classList.add('active');
             
